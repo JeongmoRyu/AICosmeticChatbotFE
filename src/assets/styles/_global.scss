@@ -1,0 +1,6 @@
+html {
+  @apply bg-primary-default;
+  body {
+    @apply antialiased overflow-x-hidden text-base text-secondary-default;
+  }
+}

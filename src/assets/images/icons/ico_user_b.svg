@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40">
+    <defs>
+        <clipPath id="or4y0zueua">
+            <circle data-name="타원 293" cx="20" cy="20" r="20" transform="translate(67)" style="fill:none"/>
+        </clipPath>
+        <clipPath id="58kc5wc0hb">
+            <path data-name="패스 14108" d="M18 2A18 18 0 1 1 0 20 18 18 0 0 1 18 2" style="fill:none"/>
+        </clipPath>
+        <clipPath id="b9v80802ac">
+            <path data-name="패스 14111" d="M69 20A18 18 0 1 0 87 2a18 18 0 0 0-18 18" style="fill:none"/>
+        </clipPath>
+    </defs>
+    <g data-name="그룹 74979">
+        <g data-name="그룹 74978" style="clip-path:url(#or4y0zueua)" transform="translate(-67)">
+            <path data-name="패스 14105" d="M87 0a20 20 0 1 1-20 20A20 20 0 0 1 87 0" style="fill:#c3c4c8"/>
+            <g data-name="그룹 74977">
+                <g data-name="그룹 74976" style="clip-path:url(#58kc5wc0hb)">
+                    <path data-name="패스 14106" d="M87 6a7 7 0 1 1-7 7 7 7 0 0 1 7-7" style="fill:#f0f0f0"/>
+                    <path data-name="패스 14107" d="M87 22a14 14 0 1 1-14 14 14 14 0 0 1 14-14" style="fill:#f0f0f0"/>
+                </g>
+            </g>
+        </g>
+    </g>
+    <g data-name="그룹 74981">
+        <g data-name="그룹 74980" style="clip-path:url(#b9v80802ac)" transform="translate(-67)">
+            <path data-name="패스 14109" d="M87 20a7 7 0 1 0-7-7 7 7 0 0 0 7 7" style="fill:#f0f0f0"/>
+            <path data-name="패스 14110" d="M87 22a14 14 0 1 0 14 14 14 14 0 0 0-14-14" style="fill:#f0f0f0"/>
+        </g>
+    </g>
+</svg>

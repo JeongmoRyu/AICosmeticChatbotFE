@@ -1,0 +1,5 @@
+.prompt-box {
+  box-shadow: 0 2px 8px 0 rgba(18, 44, 72, 0.15);
+  @apply h-16 text-lg max-h-36 w-full resize-none pl-5 pt-5 rounded-lg pr-20 search_scrollbar outline-none
+  border border-[#e2e2e2] bg-white;
+}

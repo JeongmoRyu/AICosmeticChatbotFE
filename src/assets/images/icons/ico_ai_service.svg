@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+    <defs>
+        <clipPath id="m7woospgxa">
+            <path data-name="사각형 41382" style="stroke:#fff;fill:none" d="M0 0h24v24H0z"/>
+        </clipPath>
+    </defs>
+    <g data-name="그룹 76602" style="clip-path:url(#m7woospgxa)">
+        <g data-name="그룹 76601">
+            <g data-name="그룹 76600" style="clip-path:url(#m7woospgxa)">
+                <path data-name="선 306" transform="translate(5 14)" style="stroke-miterlimit:10;stroke-width:2px;stroke:#fff;fill:none" d="M0 0h.867"/>
+                <g data-name="그룹 76604">
+                    <path data-name="패스 14766" d="M18.01 14H19a1 1 0 0 1 1 1v4a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-4a1 1 0 0 1 1-1" style="stroke-miterlimit:10;stroke-width:2px;stroke:#fff;fill:none"/>
+                    <path data-name="패스 14767" d="M8 17a1 1 0 1 1-1-1 1 1 0 0 1 1 1" style="fill:#fff"/>
+                    <path data-name="패스 14768" d="M11.462 9.658 5.829 7.346a1 1 0 0 1 0-1.691l5.633-2.312a1 1 0 0 1 1.076 0l5.633 2.312a1 1 0 0 1 0 1.691l-5.633 2.312a1 1 0 0 1-1.076 0z" style="stroke-miterlimit:10;stroke-width:2px;stroke:#fff;fill:none"/>
+                    <path data-name="패스 14769" d="m19.171 10.346-6.633 3.312a1 1 0 0 1-1.076 0l-6.633-3.312" style="stroke-miterlimit:10;stroke-width:2px;stroke:#fff;fill:none"/>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

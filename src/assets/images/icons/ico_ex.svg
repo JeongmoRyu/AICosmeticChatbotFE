@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+    <defs>
+        <clipPath id="1833hdarsa">
+            <path data-name="사각형 40665" style="stroke-width:3px;stroke:#949ca5;fill:none" d="M0 0h24v24H0z"/>
+        </clipPath>
+        <clipPath id="gpizkymldb">
+            <path data-name="사각형 40663" style="stroke-width:2px;stroke:#5b636d;fill:none" d="M0 0h24v24H0z"/>
+        </clipPath>
+    </defs>
+    <g data-name="그룹 74943" style="clip-path:url(#1833hdarsa)">
+        <g data-name="그룹 74942">
+            <g data-name="그룹 74956">
+                <path data-name="선 293" transform="translate(8.001 17)" style="stroke-miterlimit:10;stroke-width:2px;stroke:#949ca5;fill:none" d="M0 0h12"/>
+                <path data-name="선 294" transform="translate(4.001 17)" style="stroke-miterlimit:10;stroke-width:2px;stroke:#949ca5;fill:none" d="M0 0h2"/>
+                <path data-name="선 295" transform="translate(8.001 12)" style="stroke-miterlimit:10;stroke-width:2px;stroke:#949ca5;fill:none" d="M0 0h12"/>
+                <path data-name="선 296" transform="translate(4.001 12)" style="stroke-miterlimit:10;stroke-width:2px;stroke:#949ca5;fill:none" d="M0 0h2"/>
+                <path data-name="선 297" transform="translate(8.001 7)" style="stroke-miterlimit:10;stroke-width:2px;stroke:#949ca5;fill:none" d="M0 0h12"/>
+                <path data-name="선 298" transform="translate(4.001 7)" style="stroke-miterlimit:10;stroke-width:2px;stroke:#949ca5;fill:none" d="M0 0h2"/>
+            </g>
+        </g>
+    </g>
+</svg>

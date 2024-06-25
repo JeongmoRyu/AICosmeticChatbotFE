@@ -1,0 +1,49 @@
+:root {
+  --litepicker-day-width: 36px;
+}
+
+/* paging */
+.paging {
+  @apply relative flex justify-center;
+}
+.paging ul {
+  @apply flex items-center;
+}
+.paging li + li {
+  @apply ml-2.5;
+}
+.paging li:nth-child(3),
+.paging li:nth-last-child(2) {
+  @apply ml-5;
+}
+.paging .page-link {
+  @apply block w-8 h-8 rounded-medium border border-normal-border text-center leading-8 text-sm text-light;
+  &.disabled {
+    @apply pointer-events-none opacity-40;
+  }
+}
+.paging .page-link.active {
+  @apply bg-primary-default border-none leading-8 text-white;
+}
+.paging .prev-first {
+  @apply bg-[url(/src/assets/images/icons/ico_prev_first.svg)] bg-no-repeat bg-center;
+}
+.paging .prev {
+  @apply bg-[url(/src/assets/images/icons/ico_prev.svg)] bg-no-repeat bg-center;
+}
+.paging .next {
+  @apply bg-[url(/src/assets/images/icons/ico_next.svg)] bg-no-repeat bg-center;
+}
+.paging .next-end {
+  @apply bg-[url(/src/assets/images/icons/ico_next_end.svg)] bg-no-repeat bg-center;
+}
+
+.result-notfound {
+  @apply border-y border-normal-border py-36;
+}
+.result-notfound .notfound-img {
+  @apply w-10 h-10 mx-auto;
+}
+.result-notfound p {
+  @apply mt-5 text-center;
+}

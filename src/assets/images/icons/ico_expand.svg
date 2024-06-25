@@ -1,0 +1,18 @@
+<svg data-name="ico_ expand" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+    <defs>
+        <clipPath id="w1ml78pkwa">
+            <path data-name="사각형 40722" style="fill:none" d="M0 0h24v24H0z"/>
+        </clipPath>
+    </defs>
+    <g data-name="그룹 75057" style="clip-path:url(#w1ml78pkwa)">
+        <g data-name="그룹 75056">
+            <g data-name="그룹 75055" style="clip-path:url(#w1ml78pkwa)">
+                <g data-name="그룹 75059">
+                    <path data-name="패스 14145" d="M17.176 10.629v5.722a.825.825 0 0 1-.825.825H4.825A.825.825 0 0 1 4 16.351V4.825A.826.826 0 0 1 4.825 4h6.586" transform="translate(1 1.824)" style="stroke:#fff;stroke-miterlimit:10;stroke-width:2px;fill:none"/>
+                    <path data-name="패스 14146" d="M16 3h3.528a.64.64 0 0 1 .39.128.487.487 0 0 1 .2.384v3.606" transform="translate(-1.118 2)" style="stroke:#fff;stroke-miterlimit:10;stroke-width:2px;fill:none"/>
+                    <path data-name="선 305" transform="translate(13.119 5)" style="stroke:#fff;stroke-miterlimit:10;stroke-width:2px;fill:none" d="M0 5.881 5.881 0"/>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

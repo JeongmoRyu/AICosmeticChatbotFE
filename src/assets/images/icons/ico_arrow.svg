@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20">
+    <g data-name="ico_arrow">
+        <path transform="rotate(-180 10 10)" style="opacity:.396;fill:none" d="M0 0h20v20H0z"/>
+        <g data-name="그룹 77141">
+            <path data-name="선 10" transform="rotate(-180 9.5 5)" style="stroke:#fff;stroke-linecap:round;stroke-width:1.5px;fill:none" d="M18 0H0"/>
+            <path data-name="패스 413" d="m0 0 7 7.111L14 0" transform="rotate(-90 14.444 2.555)" style="stroke-linejoin:round;stroke:#fff;stroke-linecap:round;stroke-width:1.5px;fill:none"/>
+        </g>
+    </g>
+</svg>

@@ -1,0 +1,27 @@
+/* language */
+.lang {
+  @apply relative flex items-start w-20 h-10;
+}
+.lang .dropdown-toggle {
+  @apply flex justify-center items-center w-20 h-10 rounded-lg transition hover:bg-secondary-hover;
+}
+.lang .dropdown-toggle .selected {
+  @apply flex w-auto pr-5 bg-[url(/src/assets/images/icons/ico_open.svg)] bg-no-repeat bg-[right_center] bg-[length:0.625rem];
+}
+.lang .dropdown {
+  @apply top-full left-0 w-24;
+}
+.lang .dropdown li {
+  @apply h-10 leading-10 text-center hover:bg-secondary-hover;
+}
+.lang .dropdown li + li {
+  @apply border-t border-bd-default;
+}
+
+.dropdown-wrap {
+  @apply w-full flex flex-col justify-center relative;
+}
+
+.dropdown {
+  @apply overflow-hidden absolute top-full border border-bd-gray rounded-md shadow-md shadow-sh-dark/20 bg-white text-sm z-10;
+}

@@ -1,0 +1,295 @@
+:root {
+  --litepicker-day-width: 36px;
+}
+
+.month-picker {
+  @apply border border-input-border rounded-xl bg-white text-sm;
+  z-index: 999999 !important;
+  margin-top: 12px;
+  box-shadow:
+    0 10px 15px -3px rgba(0, 0, 0, 0.07),
+    0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  &:before {
+    content: '';
+    top: -9px;
+    border-bottom-color: #dee4eb;
+    border-right: 9px solid transparent;
+    border-left: 9px solid transparent;
+    border-bottom: 9px solid #dee4eb;
+    @apply absolute right-36 inline-block;
+  }
+  &:after {
+    content: '';
+    top: -8px;
+    border-right: 9px solid transparent;
+    border-bottom: 9px solid #fff;
+    border-left: 9px solid transparent;
+    @apply absolute right-36 inline-block;
+  }
+  .container__footer {
+    @apply py-5 shadow-none bg-transparent m-0 py-[20px] border-t border-[#d0d9e3] flex flex-row justify-end;
+  }
+  .button-apply,
+  .button-cancel {
+    @apply w-20 h-12 ml-1.5 mr-0 p-0 rounded-md font-medium;
+  }
+  .button-apply {
+    @apply border border-primary-dark bg-primary-default text-white;
+    &:hover {
+      @apply bg-primary-dark;
+    }
+  }
+  .button-cancel {
+    border: 1px solid #d0d9e3;
+    @apply bg-white text-default;
+    &:hover {
+      @apply bg-normal-hover;
+    }
+  }
+  .month-item-header {
+    @apply px-0 pb-0 pt-2 flex justify-center gap-x-2;
+    > div {
+      @apply flex justify-center flex-row-reverse gap-x-2;
+    }
+
+    .button-previous-year {
+      @apply flex items-center justify-center w-8 h-8 border border-[#d0d9e3] rounded bg-[url(/src/assets/images/icons/ico_prev.svg)] bg-no-repeat bg-center;
+      &:hover {
+        @apply bg-slate-100;
+      }
+      svg {
+        transform: rotate(135deg);
+        @apply -mr-1;
+      }
+    }
+    .button-next-year {
+      @apply flex items-center justify-center w-8 h-8 border border-[#d0d9e3] rounded bg-[url(/src/assets/images/icons/ico_next.svg)] bg-no-repeat bg-center;
+      &:hover {
+        @apply bg-slate-100;
+      }
+      svg {
+        transform: rotate(-45deg);
+        @apply -ml-1;
+      }
+    }
+    .button-previous-year:hover svg,
+    .button-previous-year svg,
+    .button-next-year:hover svg,
+    .button-next-year svg {
+      fill: transparent;
+      border: solid black;
+      border-width: 0 2px 2px 0;
+      border-radius: 0;
+      display: inline-block;
+      border-color: #4a5568;
+      @apply w-2 h-2 block;
+    }
+    div > .month-item-name,
+    div > .month-item-year {
+      //background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='rgb(74, 85, 104)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' class='lucide lucide-chevron-down'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+      background-size: 15px;
+      background-position: center right 0.6rem;
+      @apply bg-transparent text-sm border-0 bg-no-repeat m-0 py-1 pl-2 pr-8 rounded-md focus:outline-none focus:border-slate-200 focus:ring-transparent;
+      &:hover {
+        @apply bg-[#f2f3f7];
+      }
+    }
+  }
+  .month-item-body {
+    @apply grid grid-cols-3 gap-x-3 gap-y-2.5 my-7;
+    .button-month {
+      @apply h-12 border border-[#d0d9e3] rounded-lg;
+      &:disabled {
+        @apply text-[#949ca5];
+      }
+      &:hover {
+        @apply bg-[#f2f3f7];
+      }
+      &.selected {
+        @apply bg-[#3652d8] text-white;
+      }
+    }
+  }
+}
+
+.litepicker {
+  font-family: 'Pretendard', sans-serif !important;
+  @apply border border-input-border rounded-xl bg-white text-sm;
+  z-index: 999999 !important;
+  margin-top: 12px;
+  box-shadow:
+    0 10px 15px -3px rgba(0, 0, 0, 0.07),
+    0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  &:before {
+    content: '';
+    top: -9px;
+    border-bottom-color: #dee4eb;
+    border-right: 9px solid transparent;
+    border-left: 9px solid transparent;
+    border-bottom: 9px solid #dee4eb;
+    @apply absolute right-36 inline-block;
+  }
+  &:after {
+    content: '';
+    top: -8px;
+    border-right: 9px solid transparent;
+    border-bottom: 9px solid #fff;
+    border-left: 9px solid transparent;
+    @apply absolute right-36 inline-block;
+  }
+  .container__months,
+  .container__footer {
+    @apply py-5 shadow-none bg-transparent;
+  }
+  .container__footer {
+    @apply m-0 px-[30px] py-[20px] border-t border-[#d0d9e3];
+    .preview-date-range {
+      @apply hidden;
+    }
+    .button-apply,
+    .button-cancel {
+      @apply w-20 h-12 ml-1.5 mr-0 p-0 rounded-md font-medium;
+    }
+    .button-apply {
+      @apply border border-primary-dark bg-primary-default text-white;
+      &:hover {
+        @apply bg-primary-dark;
+      }
+    }
+    .button-cancel {
+      border: 1px solid #d0d9e3;
+      @apply bg-white text-default;
+      &:hover {
+        @apply bg-normal-hover;
+      }
+    }
+  }
+  .container__months {
+    &.columns-2 {
+      @apply justify-center;
+      width: calc((var(--litepicker-month-width) * 2) + 100px);
+    }
+    .month-item {
+      @apply flex-none;
+      padding: 0 15px 10px;
+    }
+    .month-item-weekdays-row {
+      @apply text-slate-400 mt-3;
+      > div {
+        @apply flex-none;
+      }
+    }
+    .month-item-header {
+      @apply px-0 pb-0 pt-2;
+      > div {
+        @apply flex justify-center flex-row-reverse gap-x-6;
+      }
+      .button-previous-month {
+        @apply flex items-center justify-center w-8 h-8;
+        &:hover {
+          @apply bg-slate-100;
+        }
+        svg {
+          transform: rotate(135deg);
+          @apply -mr-1;
+        }
+      }
+      .button-next-month {
+        @apply flex items-center justify-center w-8 h-8;
+        &:hover {
+          @apply bg-slate-100;
+        }
+        svg {
+          transform: rotate(-45deg);
+          @apply -ml-1;
+        }
+      }
+      .button-previous-month:hover svg,
+      .button-previous-month svg,
+      .button-next-month:hover svg,
+      .button-next-month svg {
+        fill: transparent;
+        border: solid black;
+        border-width: 0 2px 2px 0;
+        border-radius: 0;
+        display: inline-block;
+        border-color: #4a5568;
+        @apply w-2 h-2 block;
+      }
+      div > .month-item-name,
+      div > .month-item-year {
+        //background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='rgb(74, 85, 104)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' class='lucide lucide-chevron-down'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+        background-size: 15px;
+        background-position: center right 0.6rem;
+        //@apply bg-transparent text-sm border bg-no-repeat m-0 py-1 pl-2 pr-8 rounded-md focus:outline-none focus:border-slate-200 focus:ring-transparent;
+        @apply bg-transparent text-sm m-0 py-1 pl-2 pr-1 focus:outline-none focus:border-slate-200 focus:ring-transparent;
+      }
+    }
+  }
+  .container__days {
+    > div {
+      padding: 8px 0;
+    }
+    .day-item {
+      border-radius: 50%;
+      transition: all 0.2s ease-out;
+      @apply relative h-[36px] text-slate-800;
+      &.is-flipped {
+        border-radius: 50% !important;
+      }
+      &:hover {
+        @apply shadow-none border border-[#8b9cf2] rounded-full bg-[#8da0ff] text-white;
+      }
+      &.is-today,
+      &.is-today:hover {
+        border-radius: 50% !important;
+        background-color: #fff !important;
+        color: #3652d8 !important;
+        @apply border border-primary-dark;
+      }
+      &.is-start-date,
+      &.is-end-date {
+        @apply border border-primary-dark rounded-full bg-primary-default;
+      }
+      &.is-start-date:hover,
+      &.is-end-date:hover {
+        @apply rounded-full text-white;
+      }
+      &.is-in-range {
+        @apply rounded-none bg-[#f2f7ff];
+      }
+      &.is-in-range:hover {
+        @apply rounded-none bg-[#8da0ff];
+      }
+    }
+    .week-number {
+      @apply text-slate-400;
+      + .day-item {
+        @apply overflow-hidden;
+      }
+    }
+  }
+  &[data-plugins*='ranges'][data-ranges-position='bottom'] > .container__main > .container__predefined-ranges {
+    @apply items-center absolute bottom-[20px] left-[30px] h-12 shadow-none;
+    button {
+      border: 1px solid #d0d9e3;
+      @apply h-8 mr-4 px-2.5 rounded text-default font-medium cursor-pointer;
+      &:hover {
+        @apply bg-normal-hover text-default opacity-100;
+      }
+
+      // background: url('src/assets/images/icons/ico_check_disabled.svg') 0 50% no-repeat;
+      // transition: all 0.2s ease-out;
+      // @apply h-12 mr-4 pl-6 text-[#a3b1c1] font-medium cursor-pointer;
+      // &.active,
+      // &:hover {
+      //   background: url('src/assets/images/icons/ico_check_color.svg') 0 50% no-repeat;
+      //   @apply text-default font-semibold opacity-100;
+      // }
+    }
+  }
+}
+
+.datepicker {
+  @apply border border-[#d0d9e3] bg-[url(/src/assets/images/icons/ico_calendar.svg)] bg-no-repeat bg-[right_1.25rem_center] bg-[length:1rem];
+}
