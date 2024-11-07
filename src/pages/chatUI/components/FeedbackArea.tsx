@@ -1,7 +1,9 @@
+import { LOGIN } from 'data/routers';
 import { useProAIRestfulCustomAxios } from 'hooks/useProAIRestfulCustomaxios';
 import { useEffect, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useRecoilState } from 'recoil';
-import { roomInfoState as useRoomInfoState } from 'store/ai';
+import { roomInfoState as useRoomInfoState } from 'store/pro-ai';
 import { showNotification } from 'utils/common-helper';
 
 function FeedbackArea({ index, seq, isOpen, handleFeedbackArea }: FeedbackAreaProps) {
@@ -9,6 +11,7 @@ function FeedbackArea({ index, seq, isOpen, handleFeedbackArea }: FeedbackAreaPr
   const [feedbackContents, setFeedbackContents] = useState<string>('');
   const feedbackRef = useRef<HTMLTextAreaElement>(null);
   const [roomInfoState, setRoomInfoState] = useRecoilState(useRoomInfoState);
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (isOpen && feedbackRef.current) {
@@ -41,6 +44,7 @@ function FeedbackArea({ index, seq, isOpen, handleFeedbackArea }: FeedbackAreaPr
         showNotification('피드백 전송에 성공하였습니다.', 'success');
       } else {
         showNotification(response.data.message, 'error');
+        navigate(LOGIN);
       }
     } else {
       showNotification('피드백 전송에 오류가 발생하였습니다', 'error');
@@ -60,7 +64,12 @@ function FeedbackArea({ index, seq, isOpen, handleFeedbackArea }: FeedbackAreaPr
         onChange={handleChangeFeedback}
       ></textarea>
       <div className='flex justify-end'>
-        <span className='flex justify-end hover:underline cursor-pointer mt-1 text-sm w-fit' onClick={handleSendFeedback}>전송하기</span>
+        <span
+          className='flex justify-end hover:underline cursor-pointer mt-1 text-sm w-fit'
+          onClick={handleSendFeedback}
+        >
+          전송하기
+        </span>
       </div>
     </div>
   );

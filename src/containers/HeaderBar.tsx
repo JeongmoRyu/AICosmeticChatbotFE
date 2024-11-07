@@ -1,27 +1,33 @@
 import { useState, useEffect } from 'react';
-import { useNavigate, useLocation, Link } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useResetRecoilState, useRecoilValue } from 'recoil';
 
 import { userInfoState as useUserInfoStore } from 'store/userInfo';
-import { deviceState } from 'store/responsive.ts';
-import { HOME, SIGN_OUT, CHATROOM, CHATBUILDER, ADDFUNCTIONS } from 'data/routers';
+import { userLoginState as useUserLoginState } from 'store/pro-ai';
+import { HOME, SIGN_OUT, CHATROOM, CHATBUILDER, FUNCTIONS, LOGIN, ACCOUNT_ADMIN, EMBEDDING_RANKER, EMBEDDING_HISTORY, EMBEDDING_LEADERBOARD } from 'data/routers';
 
-import logo from 'assets/images/logo/logo.svg';
-import ico_close from 'assets/images/image/close.png'
-import logoutImg from 'assets/images/icons/ico_logout.svg';
-import ico_user from 'assets/images/icons/ico_user_b.svg';
-import { setNssoConfiguration, getNssoUserAttributeList, getNssoUserAttribute } from "script/nsso";
-import { hostInfoName as useHostInfoName } from 'store/ai';
+// import LangSelect from 'components/base/LangSelect';
+import UserNav from 'components/base/UserNav';
 
 export default function HeaderBar() {
   const navigate = useNavigate();
   const location = useLocation();
 
   const [title, setTitle] = useState<string>('');
-  const userInfoState = useRecoilValue(useUserInfoStore);
   const resetUserInfoState = useResetRecoilState(useUserInfoStore);
-  const currentDeviceState = useRecoilValue(deviceState);
-  const hostInfoName = useRecoilValue(useHostInfoName);
+  const userLoginState = useRecoilValue(useUserLoginState);
+  const resetUserLoginState = useResetRecoilState(useUserLoginState);
+  const [loginstate, setLoginstate] = useState<boolean>(true);
+
+  const handleLogin = () => {
+    if (!userLoginState.accessToken) {
+      navigate(LOGIN);
+    } else {
+      resetUserInfoState();
+      resetUserLoginState();
+      navigate(SIGN_OUT);
+    }
+  };
 
   useEffect(() => {
     if (location) {
@@ -29,109 +35,62 @@ export default function HeaderBar() {
       if (pathname) {
         switch (pathname) {
           case HOME:
-            setTitle('AI');
+            setTitle('Chathub');
             break;
           case CHATROOM:
-            setTitle('CHATROOM');
+            setTitle('Chat Room');
             break;
           case CHATBUILDER:
-            setTitle('CHATBUILDER');
+            setTitle('Chat Builder');
             break;
-          case ADDFUNCTIONS:
-            setTitle('ADDFUNCTIONS');
+          case FUNCTIONS:
+            setTitle('Functions');
+            break;
+          case ACCOUNT_ADMIN:
+            setTitle('Admin');
+            break;
+          case EMBEDDING_RANKER:
+            setTitle('Embedding Ranker');
+            break;
+          case EMBEDDING_HISTORY:
+            setTitle('Embedding History');
+            break;
+          case EMBEDDING_LEADERBOARD:
+            setTitle('Embedding Leaderboard');
             break;
         }
       }
     }
-  }, [location]);
-
-  const logout = () => {
-    resetUserInfoState();
-    navigate(SIGN_OUT);
-  };
-
-  const handleClickSSOAuth = (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault();
-    console.log('*** Call setNssoConfiguration ***');
-    setNssoConfiguration(
-      'ssourl',
-      callbackLogonFail,
-      callbackLogonSuccess,
-      callbackReceiveTfa,
-      callbackReceiveDuplication,
-      callbackSsoUnavailable
-    )
-  }
-  const handleClickAllAt = (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault();
-    console.log(getNssoUserAttributeList())
-  }
-  const handleClickUserAt = (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault();
-    const orgcode = getNssoUserAttribute('orgcode');
-    const companycode = getNssoUserAttribute('companycode');
-    const email = getNssoUserAttribute('email');
-    const name = getNssoUserAttribute('name');
-    const pwddt = getNssoUserAttribute('pwddt');
-
-    console.log(orgcode);
-    console.log(companycode);
-    console.log(email);
-    console.log(name);
-    console.log(pwddt);
-  }
-
-  function callbackLogonFail() {
-    console.log("로그인 실패")
-  }
-
-  function callbackLogonSuccess() {
-    console.log("로그인 성공")
-  }
-
-  function callbackReceiveTfa() {
-    console.log("2차 인증 필요")
-  }
-
-  function callbackReceiveDuplication() {
-    console.log("중복 로그인")
-  }
-
-  function callbackSsoUnavailable() {
-    console.log("SSO 서비스 장애")
-  }
+    if (userLoginState.accessToken) {
+      setLoginstate(true);
+    } else {
+      setLoginstate(false);
+      navigate(LOGIN);
+    }
+  }, [location, userLoginState]);
 
   return (
-    <div className={'flex flex-row h-16 w-full items-center border border-b-slate-300 z-50'}>
-      <div className={`flex w-72 justify-center items-center m-1 ${currentDeviceState === 'TABLET' ? 'hidden' : ''}`}>
-        <Link to={`/${hostInfoName}`}>
-          <img src={ico_close} alt='logo' />
-        </Link>
-      </div>
-      <div className='h-10 border border-r-slate-300'></div>
-      <div className='flex w-full flex-row items-center justify-between m-8'>
-        <div className='text-xl font-bold text-gray-500'>{title}</div>
-        <div className='flex flex-row justify-center items-center'>
-          <button className="mr-2" onClick={handleClickSSOAuth}>          
-            SetSSO
-          </button>
-          <button className="mr-2" onClick={handleClickAllAt}>          
-            AllAt
-          </button>
-          <button className="mr-5" onClick={handleClickUserAt}>          
-            UserAt
-          </button>
-          <img className='ml-3' src={ico_user} alt='user' />
-          <p className='m-3'>{userInfoState.user_id}</p>
-          <div
-            className='flex flex-row px-4 py-3 rounded-lg hover:cursor-pointer hover:bg-secondary-hover'
-            onClick={logout}
-          >
-            <img src={logoutImg} alt='logout' />
-            <p className='ml-2'>로그아웃</p>
-          </div>
+    <div className='header-wrap'>
+      <div className='float-left flex items-center h-16 pl-4 bg-[url(assets/images/icons/ico_navi_Home.svg)] bg-no-repeat bg-[center_left] z-[12]'>
+        <div className='bc'>
+          <span className='text-gray text-sm'>Onpromise &gt;</span>
+          {/* <span className='text-gray text-sm'>maum Chatbot &gt;</span> */}
+          <span className='text-gray text-sm font-bold'>{title}</span>
         </div>
       </div>
+      <header>
+        <div className='flex flex-1 justify-end'>
+          {/* <LangSelect isShow={false} /> */}
+          <UserNav isShow={false} />
+          <button
+            onClick={handleLogin}
+            className='flex items-center justify-center ml-2.5 px-4 py-2 border border-transparent rounded font-medium transition-all duration-300 hover:border-bgContent hover:bg-primary1-light'
+          >
+            <img src='/images/icon_logout.svg' alt='' className='mr-2 align-middle' />
+            {loginstate ? '로그아웃' : '로그인'}
+          </button>
+        </div>
+      </header>
     </div>
   );
 }

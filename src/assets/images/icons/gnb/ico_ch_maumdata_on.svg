@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" viewBox="0 0 50 50">
+    <defs>
+        <clipPath id="bppaigu5ca">
+            <path data-name="사각형 39720" style="fill:none" d="M0 0h32v32H0z"/>
+        </clipPath>
+    </defs>
+    <g data-name="ico_maum data_on" transform="translate(-16 -187)">
+        <rect width="50" height="50" rx="16" transform="translate(16 187)" style="fill:#111"/>
+        <path transform="translate(25 196)" style="opacity:.424;fill:none" d="M0 0h32v32H0z"/>
+        <g data-name="그룹 73238">
+            <path data-name="사각형 39717" transform="translate(35.789 215.614)" style="fill:#fff" d="M0 0h10.421v2.065H0z"/>
+            <path data-name="사각형 39718" transform="translate(35.789 211.484)" style="fill:#fff" d="M0 0h10.421v2.065H0z"/>
+            <g data-name="그룹 73236">
+                <g data-name="그룹 73235" style="clip-path:url(#bppaigu5ca)" transform="translate(25 196)">
+                    <path data-name="패스 4717" d="M24.539 7.233A8.577 8.577 0 0 0 7.6 7.212a8.48 8.48 0 0 0-.149 16.852 8.588 8.588 0 0 0 16.835.038 8.483 8.483 0 0 0 .253-16.869m-1.245 6.185a2.037 2.037 0 0 0 0 2.065v2.065a2.031 2.031 0 0 1-.281 1.038 2.015 2.015 0 0 1 .281 1.026v2.071a2.074 2.074 0 0 1-2.084 2.065H10.783a2.074 2.074 0 0 1-2.083-2.07v-2.065a2.063 2.063 0 0 1 .277-1.026 2.086 2.086 0 0 1-.277-1.039v-2.065a2.072 2.072 0 0 0 0-2.065v-2.064a2.075 2.075 0 0 1 2.085-2.065h10.426a2.074 2.074 0 0 1 2.084 2.065z" style="fill:#fff"/>
+                    <path data-name="사각형 39719" transform="translate(10.789 11.354)" style="fill:#fff" d="M0 0h10.421v2.065H0z"/>
+                    <path data-name="패스 4718" d="M41.195 7.751a3.1 3.1 0 1 1 3.127-3.1 3.116 3.116 0 0 1-3.127 3.1m0-4.13a1.032 1.032 0 1 0 1.042 1.032 1.038 1.038 0 0 0-1.042-1.032" transform="translate(-12.689 -.529)" style="fill:#fff"/>
+                    <path data-name="패스 4719" d="M3.678 45.268a3.1 3.1 0 1 1 3.127-3.1 3.116 3.116 0 0 1-3.127 3.1m0-4.13a1.032 1.032 0 1 0 1.042 1.033 1.038 1.038 0 0 0-1.042-1.032" transform="translate(-.184 -13.268)" style="fill:#fff"/>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

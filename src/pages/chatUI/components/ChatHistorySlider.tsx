@@ -8,19 +8,24 @@ import GiraffeIcon from 'assets/images/image/img_giraffe.png';
 import RabbitIcon from 'assets/images/image/img_rabbit.png';
 import {
   roomStatusState as useRoomStatusState,
-  chatbotDiffAdmnin as useChatbotDiffAdmnin,
+  // chatbotDiffAdmnin as useChatbotDiffAdmnin,
   isMakingQuestions as useIsMakingQuestions,
-} from 'store/ai';
+  chatbotIdState as useChatbotIdState,
+} from 'store/pro-ai';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import Skeleton from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
+import { LOGIN } from 'data/routers';
+import { useNavigate } from 'react-router-dom';
 
 const ChatHistorySlider = ({ selectedChatHistory, onClick }: IChatHistoryDataSlider) => {
   const { sendRequestProAI } = useProAIRestfulCustomAxios();
   const [chatbotHistoryTitle, setChatbotHistoryTitle] = useState<IChatHistoryTitle[]>([]);
   const [roomStatusState, setRoomStatusState] = useRecoilState(useRoomStatusState);
-  const chatbotDiffAdmnin = useRecoilValue(useChatbotDiffAdmnin);
+  // const chatbotDiffAdmnin = useRecoilValue(useChatbotDiffAdmnin);
+  const chatbotIdState = useRecoilValue(useChatbotIdState);
   const isMakingQuestions = useRecoilValue(useIsMakingQuestions);
+  const navigate = useNavigate();
 
   const getImageSrc = (index: number) => {
     switch (index % 4) {
@@ -38,12 +43,13 @@ const ChatHistorySlider = ({ selectedChatHistory, onClick }: IChatHistoryDataSli
   };
 
   const getChatbothistoryTitle = async () => {
-    const response = await sendRequestProAI(`/chatroom/${chatbotDiffAdmnin}`, 'get');
+    const response = await sendRequestProAI(`/chatroom/${chatbotIdState}`, 'get');
     if (response && response.data) {
       if (response.data.code !== 'F002') {
         setChatbotHistoryTitle(response.data.data);
       } else {
         showNotification(response.data.message, 'error');
+        navigate(LOGIN);
       }
     } else {
       showNotification('채팅 기록 획득에 오류가 발생하였습니다', 'error');

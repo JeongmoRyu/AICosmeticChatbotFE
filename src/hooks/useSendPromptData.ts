@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useRecoilState, useRecoilValue, useResetRecoilState, useSetRecoilState } from 'recoil';
 import { useProAIRestfulCustomAxios } from 'hooks/useProAIRestfulCustomaxios';
@@ -7,24 +7,27 @@ import {
   gptChatHistoryState as useGptChatHistoryStore,
   gptChatHistoryStreamState as useGptChatHistoryStreamStore,
   userLoginState as useUserLoginState,
+  chatbotIdState as useChatbotIdState,
   sequenceQuestionState,
-  chatbotDiffAdmnin as useChatbotDiffAdmnin,
+  // chatbotDiffAdmnin as useChatbotDiffAdmnin,
   hostInfoName as useHostInfoName,
   roomStatusState as useRoomStatusState,
-  isMakingQuestions as useIsMakingQuestions
-} from 'store/ai';
+  isMakingQuestions as useIsMakingQuestions,
+} from 'store/pro-ai';
 import { showNotification } from 'utils/common-helper';
 import { connectionInfoState as useConnectionInfoStore } from 'store/userInfo';
 import useGetSequenceQuestions from './useGetSequenceQuestions';
+import { LOGIN } from 'data/routers';
 
 type HeaderType = {
   'Content-Type'?: string;
 };
 
-function useSendPromptData() {
+function useSendPromptData(isTest?: boolean) {
   const { sendRequestProAI } = useProAIRestfulCustomAxios();
   const navigate = useNavigate();
   const userLoginState = useRecoilValue(useUserLoginState);
+  const chatbotIdState = useRecoilValue(useChatbotIdState);
   const hostInfoName = useRecoilValue(useHostInfoName);
   const connectionInfoState = useRecoilValue(useConnectionInfoStore);
   const [roomInfoState, setRoomInfoState] = useRecoilState(useRoomInfoState);
@@ -38,15 +41,33 @@ function useSendPromptData() {
   // const nowTime: number = parseInt(timeString.substring(1, 10));
   const { getSequenceQuestions } = useGetSequenceQuestions();
   const setSequenceQuestionsList = useSetRecoilState<IProAIQuestions[]>(sequenceQuestionState);
-  const chatbotDiffAdmnin = useRecoilValue(useChatbotDiffAdmnin);
+  // const chatbotDiffAdmnin = useRecoilValue(useChatbotDiffAdmnin);
+  // const abortControllerRef = useRef<AbortController | null>(null);
 
+  // // stopStream 함수 추가
+  // const stopStream = () => {
+  //   console.log('stopStream');
+  //   console.log(abortControllerRef.current);
+  //   if (abortControllerRef.current) {
+  //     console.log('Stopping stream...');
+  //     abortControllerRef.current.abort();
+  //     abortControllerRef.current = null;
+      
+  //     setRoomStatusState((prev) => ({
+  //       ...prev,
+  //       chatUiState: 'FINISH',
+  //       state: 'QUESTION',
+  //     }));
+  //     setGptChatHistoryStreamStore('');
+  //   }
+  // };
   const requestAnswerToMCL = async (userChatData: string, room_id: number, seq_num: number) => {
     setRoomInfoState((prev) => ({ ...prev, roomId: room_id }));
     setSequenceQuestionsList([]);
     console.log('***requestAnswerToMCL***', userChatData);
     if (userChatData !== '') {
       const response = await sendRequest(
-        `/chat/${chatbotDiffAdmnin}/${room_id}?room_id=${roomInfoState.socketId}`,
+        `/chat/${chatbotIdState}/${room_id}?room_id=${roomInfoState.socketId}`,
         'post',
         undefined,
         [
@@ -69,6 +90,7 @@ function useSendPromptData() {
           setRoomInfoState((prev) => ({ ...prev, sequence: seq_num }));
         } else {
           showNotification(response.data.message, 'error');
+          navigate(LOGIN);
         }
       }
     }
@@ -91,7 +113,6 @@ function useSendPromptData() {
     Authorization: `Bearer ${userLoginState.accessToken}`,
   };
 
-  
   const sendRequest = (
     url: string,
     method: 'post' | 'get' | 'put' | 'patch' | 'delete' = 'post',
@@ -99,22 +120,25 @@ function useSendPromptData() {
     data?: any,
   ): Promise<any> => {
     const baseURL = connectionInfoState.restful;
+    // if (abortControllerRef.current) {
+    //   abortControllerRef.current.abort();
+    // }
+    // abortControllerRef.current = new AbortController();
     const requestOptions = {
       method: method,
       headers: headers,
       body: JSON.stringify(data),
       responseType: 'stream',
+      // signal: abortControllerRef.current.signal,
     };
-  
+
     const fetchWithTimeout = (url: string, options: RequestInit, timeout: number = 180000): Promise<Response> => {
       return Promise.race([
         fetch(url, options),
-        new Promise<Response>((_, reject) =>
-          setTimeout(() => reject(new Error('Timeout')), timeout)
-        ),
+        new Promise<Response>((_, reject) => setTimeout(() => reject(new Error('Timeout')), timeout)),
       ]);
     };
-  
+
     const responseData = fetchWithTimeout(baseURL + url, requestOptions)
       .then(async (responseData) => {
         if (responseData && responseData.body) {
@@ -144,7 +168,7 @@ function useSendPromptData() {
               } else {
                 const parseData: any = new TextDecoder('utf-8').decode(value);
                 console.log('parseData: ', parseData);
-                if (parseData && !parseData.includes("|🤖Pong!|")) {
+                if (parseData && !parseData.includes('|🤖Pong!|')) {
                   const cleanedData = parseData.replaceAll('"', '');
                   temp += cleanedData;
                   if (temp.length > 0) {
@@ -159,10 +183,16 @@ function useSendPromptData() {
         }
       })
       .catch((err) => {
+        // if (err.name === 'AbortError') {
+        //   console.log('Request was aborted');
+        // } else {
+        //   console.error('Error:', err);
+        // }
         console.log(err.message);
         return null;
       })
       .finally(() => {
+        // abortControllerRef.current = null;
         setRoomStatusState((prev) => ({
           ...prev,
           chatUiState: 'FINISH',
@@ -174,10 +204,12 @@ function useSendPromptData() {
 
     return responseData;
   };
-  
+
   const checkChatUiState = async (chatData) => {
-    const NowPath = window.location.pathname
-    const TargetPath = `/chatroom/${chatbotDiffAdmnin}/`
+    const NowPath = window.location.pathname;
+    const TargetPath = `/chatroom/${chatbotIdState}`;
+    console.log(NowPath);
+    console.log(TargetPath);
 
     if (NowPath === TargetPath && roomInfoState.roomId && roomInfoState.roomId !== 0) {
       setRoomStatusState((prev) => ({ ...prev, chatUiState: 'ING' }));
@@ -185,7 +217,7 @@ function useSendPromptData() {
     } else {
       if (NowPath !== TargetPath) {
         console.log('새로운 대화방 자동 생성');
-        navigate(`/chatroom/${chatbotDiffAdmnin}/${hostInfoName}`);
+        !isTest && navigate(`/chatroom/${chatbotIdState}`);
         await createNewChatRoom(chatData);
       } else {
         setRoomStatusState((prev) => ({ ...prev, chatUiState: 'ING' }));
@@ -211,7 +243,7 @@ function useSendPromptData() {
   const createNewChatRoom = async (chat: string) => {
     console.log('***here is newchatroom***');
     console.log(chat);
-    const response = await sendRequestProAI(`/chatroom/${chatbotDiffAdmnin}`, 'post', undefined, {});
+    const response = await sendRequestProAI(`/chatroom/${chatbotIdState}`, 'post', undefined, {});
 
     if (response && response.data && response.data.result) {
       if (response.data.code !== 'F002') {
@@ -247,9 +279,10 @@ function useSendPromptData() {
         }
       } else {
         showNotification(response.data.message, 'error');
+        navigate(LOGIN);
       }
     } else {
-      showNotification('새로운_대화방_생성중에_오류가_발생하였습니다', 'error');
+      showNotification('새로운 대화방 생성중에 오류가 발생하였습니다', 'error');
       return;
     }
   };
@@ -258,6 +291,7 @@ function useSendPromptData() {
     checkChatUiState,
     createNewChatRoom,
     requestAnswerToMCL,
+    // stopStream
   };
 }
 

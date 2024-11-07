@@ -7,11 +7,11 @@ import {
   roomStatusState as useRoomStatusState,
   ProAIChatTimelineState as useProAIChatTimelineStore,
   sequenceQuestionState,
-  userLoginState as useUserLoginState,
   isMakingQuestions as useIsMakingQuestions,
-} from 'store/ai';
+  chatbotIdState as useChatbotIdState,
+  userAuthority as useUserAuthority,
+} from 'store/pro-ai';
 import { replaceWithBr } from 'utils/chat';
-import ico_pro_ai_fill from 'assets/images/icons/ico_pro_ai_fill.svg';
 import ico_user from 'assets/images/icons/ico_user_s.svg';
 import EnterIcon from 'assets/images/icons/ico_enter.svg';
 import { ChatMessage } from './components/ChatMessage';
@@ -26,6 +26,9 @@ import useSendPromptData from 'hooks/useSendPromptData';
 import useGetSequenceQuestions from 'hooks/useGetSequenceQuestions';
 import { TailSpin } from 'react-loader-spinner';
 import 'assets/styles/chat.scss';
+import { LOGIN } from 'data/routers';
+import { useNavigate } from 'react-router-dom';
+import { connectionInfoState as useConnectionInfoStore } from 'store/userInfo';
 
 export default function ChatUI() {
   const refChatlist = useRef<HTMLDivElement>(null);
@@ -39,7 +42,6 @@ export default function ChatUI() {
   const [roomInfoState, setRoomInfoState] = useRecoilState(useRoomInfoState);
   const [roomStatusState, setRoomStatusState] = useRecoilState(useRoomStatusState);
   const sequenceQuestionsList = useRecoilValue(sequenceQuestionState);
-  const userLoginState = useRecoilValue(useUserLoginState);
   const resetSequenceQuestions = useResetRecoilState(sequenceQuestionState);
   const resetGptChatHistroyState = useResetRecoilState(useGptChatHistoryStore);
   const { requestAnswerToMCL } = useSendPromptData();
@@ -53,6 +55,11 @@ export default function ChatUI() {
     prompt_2: '',
   });
   const [activeSideTab, setActiveSideTab] = useState<'setting' | 'testlog'>('setting');
+  const navigate = useNavigate();
+  const connectionInfoState = useRecoilValue(useConnectionInfoStore);
+  const chatbotIdState = useRecoilValue(useChatbotIdState);
+  const chatbotImage = `${connectionInfoState.restful}/chatbotinfo/image/${chatbotIdState}`;
+  const userAuthority = useRecoilValue(useUserAuthority);
 
   useEffect(() => {
     resetSequenceQuestions();
@@ -69,12 +76,12 @@ export default function ChatUI() {
         refChatlist.current.scrollIntoView({ behavior: 'smooth' });
       }
     } else {
-      console.log('*** reset GptHistory ***');
+      // console.log('*** reset GptHistory ***');
     }
   }, [gptChatHistoryState, gptChatHistoryStreamState]);
 
   const handleSelectQuestion = (question: string) => {
-    console.log(question);
+    // console.log(question);
     const nowTime: number = new Date().getTime();
 
     requestAnswerToMCL(question, roomInfoState.roomId, nowTime);
@@ -142,14 +149,15 @@ export default function ChatUI() {
         // setIsMakingQuestions(true);
       } else {
         showNotification(response.data.message, 'error');
+        navigate(LOGIN);
       }
     } else {
       showNotification('채팅 기록 획득에 오류가 발생하였습니다', 'error');
       return;
     }
   };
-  const editChat = () => {
-    setSiderBarOpen(!siderBarOpen);
+  const editChat = (isShow: boolean) => {
+    setSiderBarOpen(isShow);
     activeSideTab === 'testlog' && setActiveSideTab('setting');
   };
 
@@ -162,36 +170,35 @@ export default function ChatUI() {
     activeSideTab === 'setting' && setActiveSideTab('testlog');
   };
   const getDashboardlogs = async (chatroomId, seqNum) => {
-    const response = await sendRequestProAI(`/maum-admin/api/logs/?room_id=${chatroomId}&seq=${seqNum}`, 'get');
-    if (response && response.data) {
-      if (response.data.code !== 'F002') {
-        console.log(response.data);
-        setLogData(response.data);
-        console.log(logData);
+    const response = await sendRequestProAI(`/testlog/${chatroomId}/${seqNum}`, 'get');
+    if (response && response.data.data) {
+      if (response.data.data.code !== 'F002') {
+        setLogData(response.data.data);
       } else {
         showNotification(response.data.message, 'error');
+        navigate(LOGIN);
       }
     } else {
-      showNotification('채팅 기록 획득에 오류가 발생하였습니다', 'error');
+      showNotification('채팅 로그 획득에 오류가 발생하였습니다', 'error');
     }
   };
 
   return (
     <div className='page_chat'>
       <div className='chatting_box'>
-        <div className='flex items-center mt-14 min-w-0'>
-          <ToggleMenu handleEdit={editChat} />
+        <div className='flex items-center mt-5 min-w-0'>
+          <ToggleMenu handleEdit={editChat} chatbotImage={chatbotImage} />
 
-          <div className='w-[1px] h-10 bg-[#888] border' />
+          <div className='w-[1px] h-10 bg-bd-gray' />
           <ChatHistorySlider onClick={handleSelectChatHistory} selectedChatHistory={selectedChatHistory} />
         </div>
         <div id='chatbotContentBody' className='h-[calc(100vh-21rem)] min-h-[150px] overflow-y-auto mt-2 scroll-pr-6'>
-          <ul className='flex flex-col mx-auto text-[#111111] text-base text-left break-keep'>
+          <div className='flex flex-col mx-auto text-[#111111] text-base text-left break-keep'>
             {gptChatHistoryState &&
               gptChatHistoryState.history.map((item, index) => {
                 if (item.role == 'user') {
                   return (
-                    <li
+                    <div
                       key={`chatuser_${index}`}
                       className='flex w-full p-7 rounded-[0.625rem] bg-[#e7ecf1] mt-7 text-sm'
                     >
@@ -206,13 +213,15 @@ export default function ChatUI() {
                           __html: replaceWithBr(item.content as string),
                         }}
                       />
-                      <div
-                        onClick={() => handleChatLog(roomInfoState.roomId, item.seq)}
-                        className='cursor-pointer hover:bg-gray-100 rounded'
-                      >
-                        [더보기]
-                      </div>
-                    </li>
+                      {userAuthority && (
+                        <button
+                          onClick={() => handleChatLog(roomInfoState.roomId, item.seq || item.seq_num)}
+                          className='cursor-pointer hover:bg-gray-100 rounded'
+                        >
+                          [더보기]
+                        </button>
+                      )}
+                    </div>
                   );
                 } else if (item.role == 'assistant') {
                   // const lastAssistantIndex = gptChatHistoryState.history.reduce((acc, curr, idx) => {
@@ -224,16 +233,16 @@ export default function ChatUI() {
                   // }
                   return (
                     <React.Fragment key={`chatassistant_${index}`}>
-                      <li className='flex w-full p-7 rounded-[0.625rem] bg-[#fff] mt-7 text-sm'>
+                      <div className='flex w-full p-7 rounded-[0.625rem] bg-[#fff] mt-7 text-sm'>
                         <div className='h-full w-28'>
                           <div className='flex flex-col items-center justify-center'>
-                            <img className='w-6' src={ico_pro_ai_fill} alt='chatgpt' />
+                            <img className='w-[30px] h-[30px]' src={chatbotImage} alt='Chathub' />
                           </div>
                         </div>
                         <div className='flex flex-col w-full'>
                           <ChatMessage text={item.content as string} />
                         </div>
-                      </li>
+                      </div>
                       <div className='mt-2 ml-10'>
                         <div
                           className='flex items-center cursor-pointer w-fit'
@@ -256,11 +265,11 @@ export default function ChatUI() {
                 }
               })}
 
-            {gptChatHistoryStreamState && roomStatusState.chatUiState !== 'FINISH' ? (
-              <li className='flex w-full p-7 rounded-[0.625rem] bg-[#fff] mt-7 text-sm'>
+            {gptChatHistoryStreamState && roomStatusState.chatUiState !== 'FINISH' && (
+              <div className='flex w-full p-7 rounded-[0.625rem] bg-[#fff] mt-7 text-sm'>
                 <div className='h-full w-28'>
                   <div className='flex flex-col items-center justify-start'>
-                    <img className='w-6' src={ico_pro_ai_fill} alt='chatgpt' />
+                    <img className='w-[30px]' src={chatbotImage} alt='chatgpt' />
                   </div>
                 </div>
                 <ChatMessage
@@ -268,19 +277,18 @@ export default function ChatUI() {
                   type='STREAM'
                   // onStreamingComplete={handleStreamingComplete}
                 />
-              </li>
-            ) : null}
-            <li>
-              <div ref={refChatlist}></div>
-            </li>
-          </ul>
-          <ul className='flex w-full justify-end'>
+              </div>
+            )}
+
+            <div ref={refChatlist}></div>
+          </div>
+          <div className='flex justify-end my-3'>
             {isMakingQuestions ? (
               <div className='h-[50px] flex justify-start w-[80%]'>
                 <TailSpin
                   height='40'
                   width='40'
-                  color='#316094'
+                  color='#4262FF'
                   ariaLabel='tail-spin-loading'
                   radius='4'
                   wrapperStyle={{}}
@@ -293,27 +301,25 @@ export default function ChatUI() {
                 <button
                   type='button'
                   key={`sequenceQ_${index}`}
-                  className={`flex items-center justify-center border w-64 h-[50px] rounded-2xl cursor-pointer border-primary-default bg-white text-bd-darkgray text-primary-default  hover:bg-primary-default hover:text-white mt-1 ml-4`}
+                  className={`items-center justify-center ml-4 py-2 px-4 w-64 h-[53px] rounded-2xl border border-primary-default bg-white cursor-pointer text-bd-darkgray text-sm text-ellipsis text-primary-default hover:bg-primary-default hover:text-white`}
                   onClick={() => handleSelectQuestion(item['question'])}
                 >
-                  <div className='flex h-[48px] max-w-60 text-sm text-ellipsis overflow-hidden px-3 max-h-10'>
-                    {item['question']}
-                  </div>
+                  <span className='block overflow-hidden max-h-[35px]'>{item['question']}</span>
                 </button>
               ))
             ) : (
               <div className='h-[50px]'></div>
             )}
-          </ul>
+          </div>
         </div>
         <PromptBox />
       </div>
       <Sidebar
-        SidebarState={siderBarOpen}
+        sidebarState={siderBarOpen}
         handleSideBar={editChat}
         logData={logData}
         activeTab={activeSideTab}
-        setActiveTab={setActiveSideTab}
+        onChangeTab={setActiveSideTab}
       />
     </div>
   );

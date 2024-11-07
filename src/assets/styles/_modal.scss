@@ -2,7 +2,9 @@
   margin-top: -10000px;
   margin-left: -10000px;
   /* background: #000000a6; */
-  transition: visibility 0s linear 0.2s, opacity 0.2s 0s;
+  transition:
+    visibility 0s linear 0.2s,
+    opacity 0.2s 0s;
   transform: translate(-50%, 0);
   /* @apply invisible opacity-0 w-screen h-screen fixed left-0 top-0; */
   @apply invisible opacity-0 fixed top-[15%] left-1/2;
@@ -17,7 +19,9 @@
     margin-top: 0px;
     margin-left: 0px;
     z-index: 10000;
-    transition: visibility 0s ease-in-out 0s, opacity 0.4s ease-in-out 0s;
+    transition:
+      visibility 0s ease-in-out 0s,
+      opacity 0.4s ease-in-out 0s;
     @apply visible opacity-100;
     > .modal-dialog {
       @apply mt-16;
@@ -49,7 +53,7 @@
     } */
     .modal-content {
       @apply relative;
-      > [data-tw-dismiss="modal"] {
+      > [data-tw-dismiss='modal'] {
         @apply absolute right-0 top-0 mt-3 mr-3;
       }
     }
@@ -62,7 +66,9 @@
       }
     }
     &.show {
-      transition: visibility 0s ease-in-out 0s, opacity 0.6s ease-in-out 0s;
+      transition:
+        visibility 0s ease-in-out 0s,
+        opacity 0.6s ease-in-out 0s;
       @apply visible opacity-100;
       > .modal-dialog {
         @apply mr-0;
@@ -74,7 +80,7 @@
       @apply mt-0 mb-0;
       .modal-content {
         @apply rounded-none min-h-screen;
-        > [data-tw-dismiss="modal"] {
+        > [data-tw-dismiss='modal'] {
           @apply absolute top-0 left-0 right-auto mt-4 -ml-12;
         }
       }
@@ -108,16 +114,16 @@
   @apply w-full;
 }
 .table thead {
-  @apply border-y border-bd-default;
+  @apply border-y border-bd-default2;
 }
 .table th {
-  @apply h-14 bg-secondary-light font-medium text-light align-middle border-y border-solid border-bd-default;
+  @apply h-14 bg-secondary-light font-medium text-light align-middle border-y border-solid border-bd-default2;
 }
 .table td {
-  @apply h-14 px-2.5 text-center align-middle border-b border-solid border-bd-default;
+  @apply h-14 px-2.5 text-center align-middle border-b border-solid border-bd-default2;
 }
 .table tbody tr {
-  @apply border-b border-bd-default;
+  @apply border-b border-bd-default2;
 }
 .table .form-btn {
   @apply justify-center;

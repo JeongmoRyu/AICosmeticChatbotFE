@@ -1,68 +1,51 @@
 import { useEffect, useState } from 'react';
+import { useRecoilValue } from 'recoil';
 import { useProAIRestfulCustomAxios } from './useProAIRestfulCustomaxios';
 import { showNotification } from 'utils/common-helper';
+import { chatbotIdState as useChatbotIdState } from 'store/pro-ai';
 
-interface EngineListType {
-  label: string;
-  value: string;
+interface AllEngineListType {
+  elasticList: SelectListType[];
+  llmEngineList: SelectListType[];
+  ragEngineList: SelectListType[];
 }
 
-function useGetEngineDatas() {
+export default function useGetEngineDatas() {
   const { sendRequestProAI } = useProAIRestfulCustomAxios();
-  const [ragEngineList, setRAGEngineList] = useState<EngineListType[]>([]);
-  const [ragEngineData, setRAGEngineData] = useState<IRagEngineData[]>([]);
-  const [llmEngineList, setLLMEngineList] = useState<EngineListType[]>([]);
-  const [llmEngineData, setLLMEngineData] = useState<ILLMEngineData[]>([]);
+  const chatbotId = useRecoilValue(useChatbotIdState);
+  const [allEngineList, setAllEngineList] = useState<AllEngineListType>({
+    elasticList: [],
+    llmEngineList: [],
+    ragEngineList: [],
+  });
+  const [allEngineData, setAllEngineData] = useState<ILLMEngineData[]>([]);
 
   useEffect(() => {
-    getLLMEngines();
-    getRetrieverEngines();
+    getAllEngines();
   }, []);
 
-  const getLLMEngines = async () => {
-    const response = await sendRequestProAI('/llmengine/', 'get');
+  const getAllEngines = async () => {
+    const params = { chatbot_id: chatbotId };
+    const response = await sendRequestProAI('/chatbotinfo/optionlist', 'get', undefined, undefined, params);
     if (response && response.data) {
       const data = response.data.data;
-      if (data && data.length > 0) {
-        const responseData = data;
-        const typeList: EngineListType[] = responseData.map((item: Engine_Types) => ({
-          label: item.name,
-          value: item.id,
-        }));
-        setLLMEngineList(typeList);
-        setLLMEngineData(data);
+      if (data) {
+        const { elasticList, llmEngineList, ragEngineList } = data;
+        const extractIdAndName = (list) =>
+          list.map(({ id, name, parameters }) => ({ id: name, value: id, text: name, parameters: parameters }));
+        setAllEngineList({
+          elasticList: extractIdAndName(elasticList),
+          llmEngineList: extractIdAndName(llmEngineList),
+          ragEngineList: extractIdAndName(ragEngineList),
+        });
+
+        setAllEngineData(data);
       }
     } else {
-      showNotification('서버로부터 정상적인 데이터를 받지 못했습니다.', 'error');
+      showNotification('서버로부터 정상적인 엔진 정보를 받지 못했습니다.', 'error');
       return;
     }
   };
 
-  const getRetrieverEngines = async () => {
-    const response = await sendRequestProAI('/ragengine/', 'get');
-    if (response && response.data) {
-      const data = response.data.data;
-      if (data && data.length > 0) {
-        const responseData = data;
-        const RAGtypeList: EngineListType[] = responseData.map((item: Engine_Types) => ({
-          label: item.name,
-          value: item.id,
-        }));
-        setRAGEngineList(RAGtypeList);
-        setRAGEngineData(data);
-      }
-    } else {
-      showNotification('서버로부터 정상적인 데이터를 받지 못했습니다.', 'error');
-      return;
-    }
-  };
-
-  return {
-    ragEngineList,
-    ragEngineData,
-    llmEngineList,
-    llmEngineData,
-  };
+  return { allEngineList, allEngineData };
 }
-
-export default useGetEngineDatas;

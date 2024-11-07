@@ -49,6 +49,7 @@
   }
 
   ol > li {
+    position: relative;
     counter-increment: list-number;
     display: block;
     margin-bottom: 6px;

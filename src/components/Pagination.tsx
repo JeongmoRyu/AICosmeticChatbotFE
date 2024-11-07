@@ -49,62 +49,51 @@ function Pagination() {
   }, [currentPage]);
 
   return (
-    <div className='paging'>
-      <nav>
-        <ul>
-          <li className='page-item'>
-            <a
-              className={currentPage === 1 ? 'page-link prev-first disabled' : 'page-link prev-first'}
-              href='#'
-              onClick={() => setCurrentPage(1)}
-            />
-          </li>
-          <li className='page-item'>
-            <a
-              className={currentPage === 1 ? 'page-link prev disabled' : 'page-link prev'}
-              href='#'
-              onClick={() => setCurrentPage(currentPage - 1)}
-            />
-          </li>
-
-          <>
-            {pageGroup.length &&
-              pageGroup.map((page) => {
-                if (pages.length > 0) {
-                  return (
-                    <li key={page} className='page-item'>
-                      <a
-                        className={currentPage === page ? 'page-link active' : 'page-link'}
-                        href='#'
-                        onClick={() => {
-                          setCurrentPage(page);
-                        }}
-                      >
-                        {page}
-                      </a>
-                    </li>
-                  );
-                }
-              })}
-          </>
-
-          <li className='page-item'>
-            <a
-              className={currentPage === pageCount ? 'page-link next disabled' : 'page-link next'}
-              href='#'
-              onClick={() => setCurrentPage(currentPage + 1)}
-            />
-          </li>
-          <li className='page-item'>
-            <a
-              className={currentPage === pageCount ? 'page-link next-end disabled' : 'page-link next-end'}
-              href='#'
-              onClick={() => setCurrentPage(pageCount)}
-            />
-          </li>
-        </ul>
-      </nav>
-    </div>
+    <nav className='paging mt-10'>
+      <button
+        type='button'
+        className={`page-link prev-first ${currentPage === 1 ? 'disabled' : ''}`}
+        onClick={() => setCurrentPage(1)}
+      >
+        처음으로
+      </button>
+      <button
+        type='button'
+        className={`page-link prev ${currentPage === 1 ? 'disabled' : ''}`}
+        onClick={() => setCurrentPage(currentPage - 1)}
+      >
+        이전
+      </button>
+      {pageGroup.length &&
+        pageGroup.map((page) => {
+          if (pages.length > 0) {
+            return (
+              <button
+                key={`pagination_${page}`}
+                type='button'
+                className={`page-link ${currentPage === page ? 'active' : ''}`}
+                onClick={() => setCurrentPage(page)}
+              >
+                {page}
+              </button>
+            );
+          }
+        })}
+      <button
+        type='button'
+        className={`page-link next ${currentPage === pageCount ? 'disabled' : ''}`}
+        onClick={() => setCurrentPage(currentPage + 1)}
+      >
+        다음
+      </button>
+      <button
+        type='button'
+        className={`page-link next-end ${currentPage === pageCount ? 'disabled' : ''}`}
+        onClick={() => setCurrentPage(pageCount)}
+      >
+        마지막으로
+      </button>
+    </nav>
   );
 }
 

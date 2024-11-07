@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" viewBox="0 0 50 50">
+    <g transform="translate(-7776 -1221)" data-name="ico_maum bot_off">
+        <path transform="translate(7787 1232)" style="fill:none;opacity:.275" d="M0 0h28v28H0z"/>
+        <path data-name="빼기 129" d="M12948 23995h-16a4 4 0 0 1-4-4v-4a12 12 0 0 1 24 0v4a4.006 4.006 0 0 1-4 4zm-12-14a5 5 0 0 0 0 10h8a5 5 0 0 0 0-10z" transform="translate(-5139 -22738)" style="fill:#5d6167"/>
+        <rect data-name="사각형 1885" width="3" height="7" rx="1.5" transform="translate(7787 1245)" style="fill:#5d6167"/>
+        <rect data-name="사각형 1891" width="2" height="5" rx="1" transform="translate(7800 1234)" style="fill:#5d6167"/>
+        <rect data-name="사각형 1886" width="3" height="7" rx="1.5" transform="translate(7812 1245)" style="fill:#5d6167"/>
+        <path data-name="빼기 128" d="M12939 23981h-8a3 3 0 0 1 0-6h8a3 3 0 0 1 0 6zm-.5-4.5a1.5 1.5 0 1 0 1.5 1.5 1.5 1.5 0 0 0-1.5-1.5zm-7 0a1.5 1.5 0 1 0 1.5 1.5 1.5 1.5 0 0 0-1.5-1.5z" transform="translate(-5134 -22730)" style="fill:#5d6167"/>
+        <rect data-name="사각형 1892" width="4" height="4" rx="2" transform="translate(7799 1232)" style="fill:#5d6167"/>
+    </g>
+</svg>

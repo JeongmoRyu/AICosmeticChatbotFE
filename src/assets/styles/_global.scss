@@ -1,6 +1,48 @@
 html {
-  @apply bg-primary-default;
   body {
-    @apply antialiased overflow-x-hidden text-base text-secondary-default;
+    // @apply antialiased text-base text-default font-medium list-none leading-tight;
+    @apply antialiased text-base text-secondary-default overflow-hidden;
+    min-width: 1000px;
   }
+}
+
+// input[type=radio],
+// input[type=checkbox],
+// legend     {
+//   @apply sr-only !important;
+// }
+input[type='radio'],
+input[type='checkbox'],
+legend {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+input[type='radio']:focus,
+input[type='checkbox']:focus,
+input[type='radio']:checked,
+input[type='checkbox']:checked {
+  @apply ring-0;
+}
+div::-webkit-scrollbar,
+textarea::-webkit-scrollbar {
+  @apply w-2;
+}
+div::-webkit-scrollbar-thumb,
+textarea::-webkit-scrollbar-thumb {
+  @apply bg-normal-border rounded;
+}
+div::-webkit-scrollbar-track,
+textarea::-webkit-scrollbar-track {
+  @apply bg-transparent;
+}
+a,
+button {
+  -webkit-tap-highlight-color: transparent;
 }

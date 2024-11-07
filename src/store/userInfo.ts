@@ -3,7 +3,7 @@ import { recoilPersist } from 'recoil-persist';
 
 const sessionStorage = typeof window !== 'undefined' ? window.sessionStorage : undefined;
 const { persistAtom } = recoilPersist({
-  key: 'sessionStorage',
+  key: 'amore-sessionStorage',
   storage: sessionStorage,
 });
 
@@ -15,6 +15,7 @@ interface UserInfoProps {
 
 interface ConnectionInfoProps {
   restful: string;
+  socket: string;
 }
 
 const userInfoState = atom<UserInfoProps>({
@@ -31,6 +32,7 @@ const connectionInfoState = atom<ConnectionInfoProps>({
   key: "connectionInfoState",
   default: {
     restful: '',    
+    socket: '',
   },
   effects_UNSTABLE: [persistAtom],
 })

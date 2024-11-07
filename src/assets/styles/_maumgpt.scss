@@ -1,0 +1,43 @@
+.side-nav {
+  .side-menu-wrap--active {
+    @apply pb-3 bg-[#e2edfc];
+  }
+  .side-menu-single-wrap--active {
+    @apply bg-[#e2edfc];
+  }
+  .side-menu {
+    @apply rounded-xl h-12;
+    &:hover,
+    .hover {
+      background-color: #f2f3f7;
+      box-shadow: 0 1px 0 0 #d2dcea;
+    };
+    &.side-menu--active {
+      @apply rounded-t-xl rounded-b-none border-b border-b-[#d2dcea]; 
+      background-color: #e2edfc;
+    }
+    &.side-menu-single--active {
+      @apply rounded-t-xl; 
+      background-color: #e2edfc;
+    }
+    .side-menu__sub-icon {
+      @apply transition ease-in duration-100;      
+    }
+  }
+  .side-menu .side-menu__title {
+    @apply flex w-full justify-between;
+  }
+  .sub-menu {
+    @apply pt-3;
+    background-color: #e2edfc;
+  }
+}
+
+.spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}

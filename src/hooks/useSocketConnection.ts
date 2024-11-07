@@ -1,9 +1,7 @@
 import { useState, useEffect } from 'react';
 import io from 'socket.io-client';
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
-import { 
-  roomInfoState as useRoomInfoState,
-  ProAIChatTimelineState as useProAIChatTimelineStore,} from 'store/ai';
+import { roomInfoState as useRoomInfoState, ProAIChatTimelineState as useProAIChatTimelineStore } from 'store/pro-ai';
 import { connectionInfoState as useConnectionInfoStore } from 'store/userInfo';
 
 const SOCKET_EVENT = {
@@ -19,10 +17,12 @@ export const useSocketConnection = () => {
   const connectionInfoState = useRecoilValue(useConnectionInfoStore);
 
   useEffect(() => {
-    if (!socket && connectionInfoState?.restful) {
-      const baseURL = import.meta.env.VITE_APP_PRO_AI;
+    if (!socket && connectionInfoState?.socket) {
+      // const baseURL = import.meta.env.VITE_APP_PRO_AI;
+      const baseURL = connectionInfoState.socket;
       const socketIo = io(baseURL, {
         transports: ['websocket'],
+        // path: '/amore/socket.io',
       });
 
       socketIo.on('connect', () => {
@@ -45,7 +45,7 @@ export const useSocketConnection = () => {
         socketIo.disconnect();
       };
     }
-  }, [connectionInfoState.restful, socket]);
+  }, [connectionInfoState.socket, socket]);
 
   useEffect(() => {
     if (socket && roomInfoState.socketId) {
