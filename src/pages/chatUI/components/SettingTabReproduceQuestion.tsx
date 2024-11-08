@@ -38,8 +38,7 @@ export default function SettingTabReproduceQuestion({ data, onChange, parameters
             value={data.user_prompt}
             onChange={(e) => onChange('reproduce_question', 'user_prompt', e.target.value)}
           />
-          <EssentialCheck userPrompt={data.user_prompt} requiredKeys={essential_prompt} valueCheck={valueCheck} mode={mode}/>
-
+          <EssentialCheck key={`essential-check-${mode}`} userPrompt={data.user_prompt} requiredKeys={essential_prompt} valueCheck={valueCheck} mode={mode}/>
           <EditCounter
             title='Retry 횟수'
             id='reproduce_question_retry'

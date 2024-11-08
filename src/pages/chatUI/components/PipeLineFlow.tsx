@@ -265,12 +265,15 @@ function PipeLineFlow({ activeTab, onChangeTab, logData }) {
     llm: true,
   });
 
-  const setValueCheck = (mode: string, value: boolean) => {
-    setModeStates((prevStates) => ({
-      ...prevStates,
-      [mode]: value,
-    }));
-  };
+  const setValueCheck = useCallback((mode: string, value: boolean) => {
+    setModeStates((prevStates) => {
+      if (prevStates[mode] !== value) {
+        return { ...prevStates, [mode]: value };
+      }
+      return prevStates;
+    });
+  }, []);
+
 
   return (
     <>

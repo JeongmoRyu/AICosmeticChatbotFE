@@ -1,10 +1,12 @@
 import Pagination from 'components/Pagination';
 import { EMBEDDING_HISTORY } from 'data/routers';
-import EmbeddingHistory from 'pages/EmbeddingHistory';
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useRecoilState, useSetRecoilState } from 'recoil';
 import { listPageCount, pagesList, pageIndex } from 'store/page-data';
+import { Workbook } from 'exceljs';
+import { saveAs } from 'file-saver';
+
 
 interface QAData {
   id: number;
@@ -24,8 +26,8 @@ interface RankingData {
 
 
 const TABS: toggleListProps[] = [
-  { id: 'qaData', label: 'QA 데이터' },
-  { id: 'ranking', label: '랭킹' },
+  { id: 'QaData', label: 'QA 데이터' },
+  { id: 'Ranking', label: '랭킹' },
 ];
 
 // QA 데이터 예시
@@ -50,7 +52,7 @@ const rankingModelData: RankingData[] = Array.from({ length: 77 }, (_, i) => ({
 
 export default function EmbeddingLeaderboard() {
   const navigate = useNavigate();
-  const [tabActive, setTabActive] = useState('qaData');
+  const [tabActive, setTabActive] = useState('QaData');
   const [modalRect, setModalRect] = useState({ x: 0, y: 0, w: 0, h: 0 });
   const [selectedTdId, setSelectedTdId] = useState(null);
   const [selectedText, setSelectedText] = useState('');
@@ -59,6 +61,8 @@ export default function EmbeddingLeaderboard() {
   const leaderboardTopK = location.state?.topK !== undefined ? location.state.topK : 5;
   // console.log(leaderboardId, leaderboardTopK)
 
+
+  
   const tabClick = (e: React.MouseEvent<HTMLAnchorElement>, tabId: string) => {
     e.preventDefault();
     setTabActive(tabId);
@@ -100,7 +104,7 @@ export default function EmbeddingLeaderboard() {
   }, []);
 
   // 탭별 데이터 상태
-  const dataToDisplay = tabActive === 'qaData'
+  const dataToDisplay = tabActive === 'QaData'
     ? qaChunkingData.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
     : rankingModelData.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
@@ -110,7 +114,7 @@ export default function EmbeddingLeaderboard() {
       setIsLoading(true);
       // await new Promise(resolve => setTimeout(resolve, 500));
       const totalPages = Math.ceil(
-        (tabActive === 'qaData' ? qaChunkingData.length : rankingModelData.length) / itemsPerPage
+        (tabActive === 'QaData' ? qaChunkingData.length : rankingModelData.length) / itemsPerPage
       );
       setPageCount(totalPages);
       setPages(Array.from({ length: totalPages }, (_, i) => i + 1));
@@ -119,22 +123,47 @@ export default function EmbeddingLeaderboard() {
     loadData();
   }, [tabActive, setPageCount, setPages]);
 
-  // useEffect(() => {
-  //   const totalPages = Math.ceil(
-  //     (tabActive === 'qaData' ? qaMockData.length : rankingMockData.length) / itemsPerPage
-  //   );
-  //   setPageCount(totalPages);
-  //   setPages(Array.from({ length: totalPages }, (_, i) => i + 1));
-  // }, [tabActive, setPageCount, setPages]);
-
 
   useEffect(() => {
     const totalPages = Math.ceil(
-      (tabActive === 'qaData' ? qaChunkingData.length : rankingModelData.length) / itemsPerPage
+      (tabActive === 'QaData' ? qaChunkingData.length : rankingModelData.length) / itemsPerPage
     );
     setPageCount(totalPages);
     setPages(Array.from({ length: totalPages }, (_, i) => i + 1));
   }, [tabActive, setPageCount, setPages]);
+
+  // excel로 파일 전환
+  const exportToExcel = async () => {
+    const workbook = new Workbook();
+
+    const qaWorksheet = workbook.addWorksheet('QA Data');
+    qaWorksheet.columns = [
+      { header: 'No', key: 'id', width: 10 },
+      { header: 'Question', key: 'question', width: 30 },
+      { header: 'Answer', key: 'answer', width: 30 },
+      { header: 'doc_id', key: 'doc_id', width: 15 },
+      { header: 'chunk', key: 'chunk', width: 15 },
+    ];
+    qaChunkingData.forEach((data) => {
+      qaWorksheet.addRow(data);
+    });
+
+    const rankingWorksheet = workbook.addWorksheet('Ranking Data');
+    rankingWorksheet.columns = [
+      { header: 'No', key: 'id', width: 10 },
+      { header: 'Name', key: 'name', width: 30 },
+      { header: 'Embedding Model', key: 'embeddingModel', width: 30 },
+      { header: 'Hit Accuracy', key: 'hitAccuracy', width: 15 },
+      { header: 'Notes', key: 'notes', width: 15 },
+    ];
+    rankingModelData.forEach((data) => {
+      rankingWorksheet.addRow(data);
+    });
+  
+    const buffer = await workbook.xlsx.writeBuffer();
+    saveAs(new Blob([buffer]), 'EmbeddingData.xlsx');
+  };  
+
 
   return (
     <div className='page_ranker bg_white'>
@@ -143,9 +172,15 @@ export default function EmbeddingLeaderboard() {
           Embedding Ranker<span className='ico_arrow'>&gt;</span>
           <em>QA 데이터 및 랭킹</em>
         </p>
+        <div className='flex flex-row space-x-2'>
+        <button type='button' className='btn_type white big' onClick={exportToExcel}>
+          {/* {tabActive} 저장하기 */}
+          Data 저장하기
+        </button>
         <button type='button' className='btn_type white big' onClick={() => navigate(EMBEDDING_HISTORY)}>
           히스토리
         </button>
+        </div>
       </div>
 
       <ul className='tab_menu'>
@@ -158,7 +193,7 @@ export default function EmbeddingLeaderboard() {
         ))}
       </ul>
       <div className='tab_content'>
-        {tabActive === 'qaData' && (
+        {tabActive === 'QaData' && (
           <>
             <div className='flex flex-col justify-between h-full'>
 
@@ -208,10 +243,10 @@ export default function EmbeddingLeaderboard() {
                             <button
                               type='button'
                               className='btn_cell_modal'
-                              onClick={(e) => handleModalClick(e, `${tabActive}_${item.id}_1`, tabActive === 'qaData' ? (item as QAData).question : (item as RankingData).name)}
+                              onClick={(e) => handleModalClick(e, `${tabActive}_${item.id}_1`, tabActive === 'QaData' ? (item as QAData).question : (item as RankingData).name)}
                             >
                               <span className='second_line_ellipsis'>
-                                {tabActive === 'qaData' ? (item as QAData).question : (item as RankingData).name}
+                                {tabActive === 'QaData' ? (item as QAData).question : (item as RankingData).name}
                               </span>
                             </button>
                           </td>
@@ -219,24 +254,24 @@ export default function EmbeddingLeaderboard() {
                             <button
                               type='button'
                               className='btn_cell_modal'
-                              onClick={(e) => handleModalClick(e, `${tabActive}_${item.id}_2`, tabActive === 'qaData' ? (item as QAData).answer : (item as RankingData).embeddingModel)}
+                              onClick={(e) => handleModalClick(e, `${tabActive}_${item.id}_2`, tabActive === 'QaData' ? (item as QAData).answer : (item as RankingData).embeddingModel)}
                             >
                               <span className='second_line_ellipsis'>
-                                {tabActive === 'qaData' ? (item as QAData).answer : (item as RankingData).embeddingModel}
+                                {tabActive === 'QaData' ? (item as QAData).answer : (item as RankingData).embeddingModel}
                               </span>
                             </button>
                           </td>
                           <td>
-                            {tabActive === 'qaData' ? (item as QAData).doc_id : (item as RankingData).hitAccuracy}
+                            {tabActive === 'QaData' ? (item as QAData).doc_id : (item as RankingData).hitAccuracy}
                           </td>
                           <td>
                             <button
                               type='button'
                               className='btn_cell_modal'
-                              onClick={(e) => handleModalClick(e, `${tabActive}_${item.id}_3`, tabActive === 'qaData' ? (item as QAData).chunk : (item as RankingData).notes)}
+                              onClick={(e) => handleModalClick(e, `${tabActive}_${item.id}_3`, tabActive === 'QaData' ? (item as QAData).chunk : (item as RankingData).notes)}
                             >
                               <span className='second_line_ellipsis'>
-                                {tabActive === 'qaData' ? (item as QAData).chunk : (item as RankingData).notes}
+                                {tabActive === 'QaData' ? (item as QAData).chunk : (item as RankingData).notes}
                               </span>
                             </button>
                           </td>
@@ -244,66 +279,13 @@ export default function EmbeddingLeaderboard() {
                       ))
                     )}
                   </tbody>                  
-                  {/* <tbody>
-                    {isLoading ? (
-                      <tr>
-                        <td colSpan={1} className="text-left py-4">로딩중...</td>
-                      </tr>
-                    ) : dataToDisplay.length === 0 ? (
-                      <tr>
-                        <td colSpan={1} className="text-left py-4">데이터가 없습니다.</td>
-                      </tr>
-                    ) : (
-                      dataToDisplay.map((item) => (
-                        <tr key={item.id}>
-                          <td>{item.id}</td>
-                          <td>
-                            <button
-                              type='button'
-                              className='btn_cell_modal'
-                              onClick={(e) => handleModalClick(e, `${tabActive}_${item.id}_1`, tabActive === 'qaData' ? (item as QAData).question : (item as RankingData).name)}
-                            >
-                              <span className='second_line_ellipsis'>
-                                {tabActive === 'qaData' ? (item as QAData).question : (item as RankingData).name}
-                              </span>
-                            </button>
-                          </td>
-                          <td>
-                            <button
-                              type='button'
-                              className='btn_cell_modal'
-                              onClick={(e) => handleModalClick(e, `${tabActive}_${item.id}_2`, tabActive === 'qaData' ? (item as QAData).answer : (item as RankingData).embeddingModel)}
-                            >
-                              <span className='second_line_ellipsis'>
-                                {tabActive === 'qaData' ? (item as QAData).answer : (item as RankingData).embeddingModel}
-                              </span>
-                            </button>
-                          </td>
-                          <td>
-                            {tabActive === 'qaData' ? (item as QAData).doc_id : (item as RankingData).hitAccuracy}
-                          </td>
-                          <td>
-                            <button
-                              type='button'
-                              className='btn_cell_modal'
-                              onClick={(e) => handleModalClick(e, `${tabActive}_${item.id}_3`, tabActive === 'qaData' ? (item as QAData).chunk : (item as RankingData).notes)}
-                            >
-                              <span className='second_line_ellipsis'>
-                                {tabActive === 'qaData' ? (item as QAData).chunk : (item as RankingData).notes}
-                              </span>
-                            </button>
-                          </td>
-                        </tr>
-                      ))
-                    )}
-                  </tbody>                   */}
                 </table>
               </div>
               <Pagination />
             </div>
           </>
         )}
-        {tabActive === 'ranking' && (
+        {tabActive === 'Ranking' && (
           <>
             <div className='flex flex-col justify-between h-full'>
 
@@ -353,7 +335,7 @@ export default function EmbeddingLeaderboard() {
                             <button
                               type='button'
                               className='btn_cell_modal'
-                              onClick={(e) => handleModalClick(e, `ranking_${item.id}_name`, item.name)}
+                              onClick={(e) => handleModalClick(e, `Ranking_${item.id}_name`, item.name)}
                             >
                               <span className='second_line_ellipsis'>{item.name}</span>
                             </button>
@@ -362,7 +344,7 @@ export default function EmbeddingLeaderboard() {
                             <button
                               type='button'
                               className='btn_cell_modal'
-                              onClick={(e) => handleModalClick(e, `ranking_${item.id}_embedding`, item.embeddingModel)}
+                              onClick={(e) => handleModalClick(e, `Ranking_${item.id}_embedding`, item.embeddingModel)}
                             >
                               <span className='second_line_ellipsis'>{item.embeddingModel}</span>
                             </button>
@@ -372,7 +354,7 @@ export default function EmbeddingLeaderboard() {
                             <button
                               type='button'
                               className='btn_cell_modal'
-                              onClick={(e) => handleModalClick(e, `ranking_${item.id}_etc`, item.notes)}
+                              onClick={(e) => handleModalClick(e, `Ranking_${item.id}_etc`, item.notes)}
                             >
                               <span className='second_line_ellipsis'>{item.notes}</span>
                             </button>

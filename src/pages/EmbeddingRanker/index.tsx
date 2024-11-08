@@ -113,24 +113,6 @@ export default function EmbeddingRanker() {
   };
 
 
-  const handleChangeFile = (fileList: FileType[], isDelete?: boolean) => {
-    if (isDelete) {
-      setFileList(fileList);
-      setSettingData(prev => ({
-        ...prev,
-        files: fileList
-      }));
-    } else {
-      setFileList((prevFileList) => {
-        const newFileList = prevFileList ? [...prevFileList, ...fileList] : fileList;
-        setSettingData(prev => ({
-          ...prev,
-          files: newFileList
-        }));
-        return newFileList;
-      });
-    }
-  };
 
   // 선택된 임베딩 모델 중 click된 모델 리스트 변경
   const handleModelCheck = (modelId: string, checked: boolean, selectedModel?: any) => {
@@ -479,13 +461,7 @@ export default function EmbeddingRanker() {
                   })}
                 </ul>
               </div>
-              <FileUploadList
-                onChangeFile={handleChangeFile}
-                fileList={fileList}
-                textInfo='*RAG용 자료를 업로드하세요. 각 1GB 이내의 PDF 파일만 업로드 가능합니다.'
-                isMultiple={true}
-                accept='.pdf'
-              />
+
             </div>
             {showProgress && (
               <div className='progress_box'>

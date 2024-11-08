@@ -531,16 +531,14 @@ AI 컨설턴트가 고객의 질문의 의도를 좀 더 명확하게 파악할 
     llm: true,
   });
 
-  const setValueCheck = (mode: string, value: boolean) => {
-    setModeStates((prevStates) => ({
-      ...prevStates,
-      [mode]: value,
-    }));
-  };
-
-  useEffect(() => {
-    console.log('modeStates:', modeStates);
-  }, [modeStates]);
+  const setValueCheck = useCallback((mode: string, value: boolean) => {
+    setModeStates((prevStates) => {
+      if (prevStates[mode] !== value) {
+        return { ...prevStates, [mode]: value };
+      }
+      return prevStates;
+    });
+  }, []);
 
   return (
     <div className='page_builder'>
