@@ -73,6 +73,7 @@ export default function SubSideMenu() {
       subList: [
         { id: 'chathub', text: 'Chathub', ico: logo, movePage: HOME },
         // { id: 'embeddingRanker', text: 'Embedding Ranker', ico: logo, movePage: EMBEDDING_HISTORY },
+        ...(userAuthority ? [{ id: 'embeddingRanker', text: 'Embedding Ranker', ico: logo, movePage: EMBEDDING_HISTORY }] : []),
       ],
     },
     // {

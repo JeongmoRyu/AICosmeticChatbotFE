@@ -6,10 +6,11 @@ import { EMBEDDING_HISTORY, EMBEDDING_LEADERBOARD } from 'data/routers';
 import EmbeddingSetting from './components/EmbeddingSetting';
 import io from "socket.io-client";
 import useEREngineSelect from 'hooks/useEREngineSelect';
-import { useRecoilState } from 'recoil';
+import { useRecoilState, useRecoilValue } from 'recoil';
 import { connectionInfoState as useConnectionInfoStore } from 'store/userInfo';
 import { showNotification } from 'utils/common-helper';
 import { useProAIRestfulCustomAxios } from 'hooks/useProAIRestfulCustomaxios';
+import { userLoginState as useUserLoginState } from 'store/pro-ai';
 
 
 export default function EmbeddingRanker() {
@@ -17,6 +18,7 @@ export default function EmbeddingRanker() {
   const [fileList, setFileList] = useState<FileType[] | undefined>(undefined);
   const [connectionInfoState, setConnectionInfoState] = useRecoilState(useConnectionInfoStore);
   const [progress, setProgress] = useState(0);
+  const [progressTitle, setProgressTitle] = useState('임베딩 모델에 대한 리트리버 생성중...');
   const [modelList, setModelList] = useState<(string | ICustomModel)[]>([]);
   // 선택된 임베딩 모델 리스트
   const [selectedModels, setSelectedModels] = useState<(string | ICustomModel)[]>([]);
@@ -24,6 +26,8 @@ export default function EmbeddingRanker() {
   const SELECT_EMBEDDING_MODEL_LIST = useEREngineSelect();
   const { sendRequestProAI } = useProAIRestfulCustomAxios();
   const [showProgress, setShowProgress] = useState<boolean>(false);
+  const [getRankerId, setGetRankerId] = useState<number>(0);
+  const userLoginState = useRecoilValue(useUserLoginState);
 
   useEffect(() => {
     const initializeModelList = async () => {
@@ -38,70 +42,88 @@ export default function EmbeddingRanker() {
 
   const [settingData, setSettingData] = useState<IRankerData>({
     files: [],
-    jsonMap: {
+    jsonData: {
       name: '',
       top_k: 5,
       chunking_settings: {
         use_semantic_chunk: false,
         use_fixed_chunk: true,
         fixed_chunk_size: 2100,
-        fixed_chunk_overlap: 2100,
+        fixed_chunk_overlap: 2000,
         semantic_chunk_bp_type: 'percentile',
         semantic_chunk_embedding: 'text-embedding-ada-002'
       },
       embedding_models: [],
       client_id: ''
-    }
+    },
+    id: 0
   });
 
 
   const runRankerWithSocket = () => {
     setShowProgress(true);
-    // runRanker()
+    runRanker()
     console.log(settingData)
-    const timer = setInterval(() => {
-      setProgress((prevProgress) => {
-        if (prevProgress >= 100) {
-          clearInterval(timer);
-          // setShowProgress(false);
-          setTimeout(() => {
-            // navigate(EMBEDDING_LEADERBOARD);
-            navigate(EMBEDDING_LEADERBOARD, { state: { id: 0, topK: 3 } })
-          }, 1000);
-          return 100;
-        }
-        return prevProgress + 5;
-      });
-    }, 1000);
 
     return () => {
-      clearInterval(timer);
+      // clearInterval(timer);
       setShowProgress(false);
     };
-
   };
+  useEffect(() => {
+    if (progress > 100) {
+      if (getRankerId !== 0) {
+        navigate(EMBEDDING_LEADERBOARD, { state: { id: getRankerId, topK: settingData.jsonData.top_k } });
+      } else {
+        navigate(EMBEDDING_HISTORY);
+      }
+    }
+  }, [progress, progressTitle, navigate]);
 
   const runRanker = async () => {
     const missingFields: string[] = [];
     if (settingData.files.length === 0) {
       missingFields.push('파일');
     }
-    if (!settingData.jsonMap.name) {
+    if (!settingData.jsonData.name) {
       missingFields.push('이름');
     }
-    if (settingData.jsonMap.embedding_models.length === 0) {
+    if (settingData.jsonData.embedding_models.length === 0) {
       missingFields.push('임베딩 모델');
     }
     if (missingFields.length > 0) {
       const missingFieldsString = missingFields.join(', ');
       showNotification(`${missingFieldsString}은 Embedding Ranker의 필수 항목입니다.`, 'info');
+      setShowProgress(false);
       return;
     }
 
+    const formData = new FormData();
+    settingData.files.forEach((item) => {
+      if (item.file) {
+        formData.append('files', item.file);
+      } else {
+        console.warn('File is undefined for item:', item);
+      }
+    });
+    formData.append('jsonData', JSON.stringify(settingData.jsonData));
+
+    // 파일 업로드를 위한 Content-Type 설정
+    const headers = {
+      'Content-Type': 'multipart/form-data',
+      Authorization: `Bearer ${userLoginState.accessToken}`,
+    };
+
     console.log(settingData)
-    const response = await sendRequestProAI('/ranker/evaluate-embeddings', 'post', undefined, settingData, undefined);
+    const response = await sendRequestProAI('/ranker/evaluate-embeddings', 'post', headers, formData, undefined);
     if (response && response.data) {
       if (response.data.code === 'F000') {
+        const { data } = response.data;
+        console.log(data)
+        if (data.history_id) {
+          console.log(`***********생성된 id: ${data.history_id}***********`);
+          setGetRankerId(data.history_id);
+        }
         showNotification(`${response.data.message}`, 'success');
       } else {
         showNotification(`${response.data.message}`, 'error');
@@ -133,8 +155,8 @@ export default function EmbeddingRanker() {
       }
       setSettingData(prevData => ({
         ...prevData,
-        jsonMap: {
-          ...prevData.jsonMap,
+        jsonData: {
+          ...prevData.jsonData,
           embedding_models: newSelected
         }
       }));
@@ -174,6 +196,24 @@ export default function EmbeddingRanker() {
   };
 
 
+  const handleChangeFile = (fileList: FileType[], isDelete?: boolean) => {
+    if (isDelete) {
+      setFileList(fileList);
+      setSettingData(prev => ({
+        ...prev,
+        files: fileList
+      }));
+    } else {
+      setFileList((prevFileList) => {
+        const newFileList = prevFileList ? [...prevFileList, ...fileList] : fileList;
+        setSettingData(prev => ({
+          ...prev,
+          files: newFileList
+        }));
+        return newFileList;
+      });
+    }
+  };
   // useEffect(() => {
   //   const timer = setInterval(() => {
   //     setProgress((prevProgress) => {
@@ -219,9 +259,9 @@ export default function EmbeddingRanker() {
         reconnectionAttempts: 5,
         reconnectionDelay: 1000,
         // timeout: 10000
-        // query: {
-        //   isRanker: true,
-        // }
+        query: {
+          is_ranker: true,
+        }
       });
 
       connectedSocket.on('connect', () => {
@@ -241,13 +281,25 @@ export default function EmbeddingRanker() {
         console.log(connectedSocket)
         setSettingData(prevData => ({
           ...prevData,
-          jsonMap: {
-            ...prevData.jsonMap,
+          jsonData: {
+            ...prevData.jsonData,
             client_id: data.room
           }
         }));
         // console.log(`*** Socket Fetch Room ID *** ${connectedSocket.id}`);
       });
+      connectedSocket.on(SOCKET_EVENT.NEURON_STATUS, (data: SOCKET_DATA) => {
+        if (data.title === "result") {
+          const content = JSON.parse(data.content as string);
+          if (content.process !== undefined) {
+            setProgress(content.process);
+          }
+          if (content.message) {
+            setProgressTitle(content.message);
+          }
+        }
+      });
+
 
       return connectedSocket;
     } catch (error) {
@@ -288,10 +340,10 @@ export default function EmbeddingRanker() {
       if (type === 'chunking_settings') {
         return {
           ...prev,
-          jsonMap: {
-            ...prev.jsonMap,
+          jsonData: {
+            ...prev.jsonData,
             chunking_settings: {
-              ...prev.jsonMap.chunking_settings,
+              ...prev.jsonData.chunking_settings,
               [key]: value
             }
           }
@@ -300,8 +352,8 @@ export default function EmbeddingRanker() {
       if (key === '') {
         return {
           ...prev,
-          jsonMap: {
-            ...prev.jsonMap,
+          jsonData: {
+            ...prev.jsonData,
             [type]: value
           }
         };
@@ -309,18 +361,18 @@ export default function EmbeddingRanker() {
       if (type === 'embedding_models') {
         return {
           ...prev,
-          jsonMap: {
-            ...prev.jsonMap,
+          jsonData: {
+            ...prev.jsonData,
             embedding_models: value
           }
         };
       }
       return {
         ...prev,
-        jsonMap: {
-          ...prev.jsonMap,
+        jsonData: {
+          ...prev.jsonData,
           [type]: {
-            ...prev.jsonMap[type],
+            ...prev.jsonData[type],
             [key]: value
           }
         }
@@ -366,17 +418,17 @@ export default function EmbeddingRanker() {
   }, [socket]);
 
   let ChunkingType = '';
-  const useFixedChunk = settingData.jsonMap.chunking_settings.use_fixed_chunk;
-  const useSemanticChunk = settingData.jsonMap.chunking_settings.use_semantic_chunk;
+  const useFixedChunk = settingData.jsonData.chunking_settings.use_fixed_chunk;
+  const useSemanticChunk = settingData.jsonData.chunking_settings.use_semantic_chunk;
 
   if (!useFixedChunk && !useSemanticChunk) {
     showNotification('Chunk 방식은 필수입니다.', 'info')
     setSettingData(prev => ({
       ...prev,
-      jsonMap: {
-        ...prev.jsonMap,
+      jsonData: {
+        ...prev.jsonData,
         chunking_settings: {
-          ...prev.jsonMap.chunking_settings,
+          ...prev.jsonData.chunking_settings,
           use_fixed_chunk: true
         }
       }
@@ -389,6 +441,22 @@ export default function EmbeddingRanker() {
   } else if (useSemanticChunk) {
     ChunkingType = 'Semantic chunking만 수행';
   }
+
+  const chunkSize = settingData.jsonData.chunking_settings.fixed_chunk_size;
+  const overlapSize = settingData.jsonData.chunking_settings.fixed_chunk_overlap;
+  if (chunkSize <= overlapSize && overlapSize >= 150) {
+    setSettingData(prev => ({
+      ...prev,
+      jsonData: {
+        ...prev.jsonData,
+        chunking_settings: {
+          ...prev.jsonData.chunking_settings,
+          fixed_chunk_overlap: chunkSize - 100
+        }
+      }
+    }));
+  }
+
 
   return (
     <div className='page_ranker'>
@@ -405,7 +473,7 @@ export default function EmbeddingRanker() {
       <div className='row_box'>
         <div className='round_border_box'>
           <div className='scroll_wrap'>
-            <EmbeddingSetting type='ranker' data={settingData.jsonMap} onChange={handleChangeSetting} embeddingModelList={SELECT_EMBEDDING_MODEL_LIST} AddModel={handleAddModel} />
+            <EmbeddingSetting type='ranker' data={settingData.jsonData} onChange={handleChangeSetting} embeddingModelList={SELECT_EMBEDDING_MODEL_LIST} AddModel={handleAddModel} />
           </div>
         </div>
         <div className='round_border_box'>
@@ -460,18 +528,25 @@ export default function EmbeddingRanker() {
                     }
                   })}
                 </ul>
+                <FileUploadList
+                  onChangeFile={handleChangeFile}
+                  fileList={fileList}
+                  textInfo='*RAG용 자료를 업로드하세요. 각 1GB 이내의 PDF 파일만 업로드 가능합니다.'
+                  isMultiple={true}
+                  accept='.pdf'
+                />
               </div>
 
             </div>
             {showProgress && (
               <div className='progress_box'>
                 <p className='text-[16px] font-[500] mb-[10px] mt-[10px]'>
-                  임베딩 모델에 대한 리트리버 생성중...
+                  {progressTitle}
                 </p>
 
                 <div className="relative h-2 bg-[#F2F3F7] rounded-full overflow-hidden">
                   <div
-                    className="absolute h-full bg-blue-500 transition-all duration-500 ease-out rounded-[7px]"
+                    className="absolute h-full bg-blue-500 transition-all duration-1000 ease-in-out rounded-[7px]"
                     style={{
                       width: `${progress}%`,
                       background: 'linear-gradient(90deg, #4262FF, #6483FF)'
@@ -489,9 +564,9 @@ export default function EmbeddingRanker() {
                 type='button'
                 className='btn_type white big'
                 disabled={showProgress}
-                onClick={showProgress ? undefined: runRankerWithSocket}
+                onClick={showProgress ? undefined : runRankerWithSocket}
               >
-                {showProgress? '실행중...' : '실행하기'}
+                {showProgress ? '실행중...' : '실행하기'}
               </button>
             </div>
           </div>

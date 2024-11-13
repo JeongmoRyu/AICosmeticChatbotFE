@@ -220,7 +220,7 @@ export default function Functions() {
               file_list: [...functionsDetail.file_list, ...data.data],
             };
           }
-
+          console.log(detailAddFiles)
           handleFunctionSaveAPI({ ...detailAddFiles });
         } else {
           detailAddFiles = functionsDetail;

@@ -22,33 +22,20 @@ interface Props {
   onChange?: (type: string, key: string, value: any) => void;
   embeddingModelList?: SelectListType[];
   AddModel?: (name: string, type: string, model: ICustomModel) => void;
+  files?: string[];
+  data_id?: number;
+  setIsModalVisible?: React.Dispatch<React.SetStateAction<boolean>>;
+  onDeleteSuccess?: () => void;
 }
 
-export default function EmbeddingSetting({ type, data, onChange, embeddingModelList, AddModel }: Props) {
+export default function EmbeddingSetting({ type, data, onChange, embeddingModelList, AddModel, files, data_id, setIsModalVisible, onDeleteSuccess }: Props) {
   const SELECT_TYPE_LIST = useEmbeddingRankerCodeSelect('SEMANTIC_CHUNKING_BP_TYPE');
   const SELECT_EMBEDDING_LIST = useEmbeddingRankerCodeSelect('SEMANTIC_CHUNKING_EMBEDDING');
   const navigate = useNavigate();
   const [selectedRrfModels, setSelectedRrfModels] = useState<IModelWeight[]>([]);
   const [rrfSelectValue, setRrfSelectValue] = useState<number>(0);
   const [rrfModelName, setRrfModelName] = useState<string>('');
-  const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  useEffect(() => {
-    setIsLoading(true);
-
-    const timer = setInterval(() => {
-    }, 1000);
-
-    const timeout = setTimeout(() => {
-      setIsLoading(false);
-      clearInterval(timer);
-    }, 3000);
-
-    return () => {
-      clearInterval(timer);
-      clearTimeout(timeout);
-    };
-  }, []);
 
   const handleChange = (type: string, key: string, value: any) => {
     if (onChange && type !== 'history') {
@@ -124,26 +111,17 @@ export default function EmbeddingSetting({ type, data, onChange, embeddingModelL
   };
 
 
-  const files = [{ name: 'test.pdf', size: 100 }, { name: 'test.pdf', size: 100 }, { name: 'test.pdf', size: 100 }, { name: 'test.pdf', size: 100 }];
+
+  // 삭제 및 modal open
+  const handleDeleteDetail = () => {
+    console.log(data_id);
+    setIsModalVisible && setIsModalVisible(true);
+  };
+
   return (
     // <>
     <div className='w-full h-full relative'>
-
-      {/* {isLoading && (
-        <div className='flex justify-center items-center z-[15] fixed top-0 left-0 w-full h-full bg-black bg-opacity-20'>
-        <TailSpin
-          height='80'
-          width='80'
-          color='#4262FF'
-          ariaLabel='tail-spin-loading'
-          radius='2'
-          wrapperStyle={{}}
-          wrapperClass=''
-          visible={true}
-        />
-      </div>
-      )} */}
-      {type === 'history' && isLoading && (
+      {/* {type === 'history' && isLoading && (
         <div className='absolute inset-0 flex justify-center items-center z-10 overflow-hidden'>
           <TailSpin
             height='80'
@@ -156,7 +134,7 @@ export default function EmbeddingSetting({ type, data, onChange, embeddingModelL
             visible={true}
           />
         </div>
-      )}
+      )} */}
       <EditTextInput
         id='rankName'
         labelText='이름'
@@ -182,7 +160,8 @@ export default function EmbeddingSetting({ type, data, onChange, embeddingModelL
             smallText='단위 : 토큰'
             min={min}
             max={max}
-            initialValue={data.chunking_settings.fixed_chunk_size}
+            value={data.chunking_settings.fixed_chunk_size}
+            // initialValue={data.chunking_settings.fixed_chunk_size}
             onChange={(value) => handleChange('chunking_settings', 'fixed_chunk_size', value)}
             isDisabled={type === 'history'}
           />
@@ -191,7 +170,8 @@ export default function EmbeddingSetting({ type, data, onChange, embeddingModelL
             smallText='단위 : 토큰'
             min={min}
             max={max}
-            initialValue={data.chunking_settings.fixed_chunk_overlap}
+            value={data.chunking_settings.fixed_chunk_overlap}
+            // initialValue={data.chunking_settings.fixed_chunk_overlap}
             onChange={(value) => handleChange('chunking_settings', 'fixed_chunk_overlap', value)}
             isDisabled={type === 'history'}
           />
@@ -238,11 +218,6 @@ export default function EmbeddingSetting({ type, data, onChange, embeddingModelL
               />
             </div>
           </div>
-          {/* <div className='btn_box'>
-            <button type='button' className='btn_type white big'>
-              적용하기
-            </button>
-          </div> */}
         </div>
       </div>
       {type === 'ranker' && (
@@ -341,15 +316,15 @@ export default function EmbeddingSetting({ type, data, onChange, embeddingModelL
                 <img className='ico_up' src={icon_up} alt={openAccordion.embeddingList ? '접기' : '펼치기'} />
               </button>
               <div className='accordion_content bg-[#f2f3f7] p-2'>
-                <ul className='list-disc p-5'>
+                <ul className='p-5 space-y-2.5'>
                   {data.embedding_models.map((model, index) => (
                     <li key={index}>
                       {typeof model === 'string' ? (
-                        <strong>{model}</strong>
+                        <strong className='pl-4 block'>{model}</strong> 
                       ) : (
                         <div>
-                          <strong>{model.name}</strong>
-                          <ul className='list-disc pl-5'>
+                          <strong className='pl-4 block'>{model.name}</strong>
+                          <ul className='list-disc pl-11'>
                             {model.ensemble.map((weightItem, weightIndex) => (
                               <li key={weightIndex}>
                                 {weightItem.model} (weight: {weightItem.weight})
@@ -370,35 +345,28 @@ export default function EmbeddingSetting({ type, data, onChange, embeddingModelL
               </button>
               <div className='accordion_content'>
                 <ul className='file_list'>
-                  {files.length > 0 &&
+                  {files && files.length > 0 &&
                     files.map((item, index) => (
-                      <div key={`${item.name}_${index}`} className={`flex ${index > 0 ? 'mt-[15px]' : 'mt-[5px]'}`}>
-                        <img src={getFileIcon(item.name)} alt={item.name} className='mr-2 w-5 h-5' />
+                      <div key={`${item}_${index}`} className={`flex ${index > 0 ? 'mt-[15px]' : 'mt-[5px]'}`}>
+                        <img src={getFileIcon(item)} alt={item} className='mr-2 w-5 h-5' />
                         <p>
-                          {item.name} ({getByteSize(item.size)})
+                          {item}
                         </p>
                       </div>
                     ))}
-
-
-                  {/* <li>
-                  <img className='ico' src={icon_pdf} alt='' />
-                  <span className='file_name'>이름 길면 이렇게 잘립니다.pdf</span>
-                  <span className='file_size'>0.5GB</span>
-                </li> */}
                 </ul>
               </div>
             </div>
             <div className='flex flex-row justify-end space-x-2'>
               <div className='btn_box'>
                 {/* <button type='button' className='btn_type white big' onClick={() => navigate(EMBEDDING_LEADERBOARD)}> */}
-                <button type='button' className='btn_type red big' onClick={() => console.log('hello')}>
+                <button type='button' className='btn_type red big' onClick={handleDeleteDetail}>
                   삭제하기
                 </button>
               </div>
               <div className='btn_box'>
                 {/* <button type='button' className='btn_type white big' onClick={() => navigate(EMBEDDING_LEADERBOARD)}> */}
-                <button type='button' className='btn_type white big' onClick={() => navigate(EMBEDDING_LEADERBOARD, { state: { id: 0, topK: 3 } })}>
+                <button type='button' className='btn_type white big' onClick={() => navigate(EMBEDDING_LEADERBOARD, { state: { id: data_id, topK: data.top_k } })}>
                   QA 데이터/랭킹
                 </button>
               </div>

@@ -5,13 +5,13 @@ interface Props {
   smallText: string;
   min: number;
   max: number;
-  initialValue: number;
+  value: number;
   onChange: (value: number) => void;
   isDisabled?: boolean;
 }
 
-export default function DragSlider({ label, smallText, min, max, initialValue, onChange, isDisabled }: Props) {
-  const [value, setValue] = useState<number>(initialValue);
+export default function DragSlider({ label, smallText, min, max, value, onChange, isDisabled }: Props) {
+  // const [value, setValue] = useState<number>(value);
   const sliderRef = useRef<HTMLInputElement>(null);
   const valueLabelRef = useRef<HTMLDivElement>(null);
   const spot1Ref = useRef<HTMLSpanElement>(null);
@@ -61,7 +61,7 @@ export default function DragSlider({ label, smallText, min, max, initialValue, o
   const handleSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (isDisabled) return;
     const newValue = parseInt(e.target.value);
-    setValue(newValue);
+    // setValue(newValue);
     onChange(newValue); 
     // setValue(parseInt(e.target.value));
   };
